@@ -219,7 +219,7 @@ To analyze the protection offered by differential privacy, let us assume that th
 ![equation](http://www.sciweavers.org/tex2img.php?eq=\epsilon%3Dln\frac{p%28K-1%29}{1-p}&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=)
 
 The following are important considerations in the differential privacy analysis:
-* Ensuring that each ad interest or targeting dimension is not microtargeted is not sufficient. For example, one can adversarially encode identity for every individual on the earth using 23 binary ad interests without microtargeting and exchange it with other parties.
+* Ensuring that each ad interest or targeting dimension is not microtargeted is not sufficient. For example, one can adversarially encode identity for every individual on the earth using 33 binary ad interests without microtargeting and exchange it with other parties.
 * There could be additional alternate approaches for clustering users within time epoch and/or selection of alternate cluster centroid based on distance or likelihood measures. We would rather focus this proposal on system design and intend to follow up with additional algorithms and formal analysis of same as separate discussions.
 * Separating contextual ad requests and interest-based ad requests is a weak form of privacy protection, if any. Ad requests with multiple ad interests without privacy anonymization can be used to exchange user identity between multiple advertisers. Privacy parameters need to be analyzed for all requests simultaneously even though they are sent separately at different times.
 * Contextual ad requests without any privacy anonymization exchange user identity between a publisher and an ad network. Often, an entity partners with an ad network as both publisher and advertiser to be able to join data on user identity.
@@ -236,7 +236,7 @@ We understand that this significant change compared to current contextual ad req
 
 ### Multiple segregated ad requests vs. a single ad request
 
-The key difference between previously proposed approaches such as TURTLEDOVE and PARAKEET is multiple ad requests with segregated information vs. a combined anonymized ad request. Multiple fragmented ad requests are an interesting primitive. However, that approach requires simplified aggregate functions, such as the auction, to be client-side. In most ads systems, user and contextual information are used in multiple stages, such as ad relevance computation, click and conversion propensity predictions, policy controls, creative optimization, bid models, and pricing. Incorporating each of these capabilities in client-side aggregation methods is challenging and an oversimplification. We propose to provide non-fragmented, anonymized ad requests that allow ad networks to perform key functionality while restricting request parameters via differential privacy. We propose to provide user transparency regarding the ad interest and contextual information that could be sent in ad requests and to allow the user to control the information. 
+The key difference between PARAKEET and previously proposed approaches such as TURTLEDOVE is that PARAKEET provides a combined, anonymized ad request while the others separate/fragment information across multiple ad requests. Multiple fragmented ad requests are an interesting primitive. However, that approach requires simplified aggregate functions, such as the auction, to be client-side. In most ads systems, user and contextual information are used in multiple stages, such as ad relevance computation, click and conversion propensity predictions, policy controls, creative optimization, bid models, and pricing. Incorporating each of these capabilities in client-side aggregation methods is challenging and an oversimplification. We propose to provide non-fragmented, anonymized ad requests that allow ad networks to perform key functionality while restricting request parameters via differential privacy. We propose to provide user transparency regarding the ad interest and contextual information that could be sent in ad requests and to allow the user to control the information. 
 
 A privacy cost analysis of these two different proposals should be compared extensively, looking at benefits and limitations for privacy, monetization, cost, and adoption simplicity. 
 
@@ -283,7 +283,7 @@ The proposals we provide comparisons to below is not intended to be exhaustive. 
 
  - ***[TURTLEDOVE](https://github.com/WICG/turtledove)***:
 
-   As described earlier in this document, the most significant difference between SPARROW and TURTLEDOVE is that TURTLEDOVE completely separates contextual and interest group signals by making two separate uncorrelated requests.
+   As described earlier in this document, the most significant difference between PARAKEET and TURTLEDOVE is that TURTLEDOVE completely separates contextual and interest group signals by making two separate uncorrelated requests.
 
    The TURTLEDOVE set of proposals continues to evolve. The Google Chrome team has a specific prototype implementation that combines ideas from those proposals called [FLEDGE](https://github.com/WICG/turtledove/blob/master/FLEDGE.md).
    
