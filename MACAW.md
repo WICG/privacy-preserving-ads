@@ -267,7 +267,7 @@ We proposed a generic secure compute-based setup for DSP bid functions and SSP a
 ### Partial encryption for user features or model parameters 
 Current proposal assumes encryption of `<contextual information, user features>` and model parameters. Partially revealing values could reduce protocol cost and should be explored further.
 
-[Open a new issue](https://github.com/WICG/privacy-preserving-ads/issues/new?labels=MaCAW&template=MACAW.md&title=%MaCAW%5D+%3CTITLE+HERE%3E)
+[Open a new issue](https://github.com/WICG/privacy-preserving-ads/issues/new?labels=MaCAW&template=MACAW.md&title=%5BMaCAW%5D+%3CTITLE+HERE%3E)
 
 See open GitHub Issues: <a href="https://github.com/WICG/privacy-preserving-ads/labels/MaCAW">
-    ![GitHub issues by-label](https://img.shields.io/github/issues/WICG/privacy-preserving-ads/labels/MaCAW?label=issues)</a> |
+    ![GitHub issues by-label](https://img.shields.io/github/issues/WICG/privacy-preserving-ads/MaCAW?label=issues)</a> |

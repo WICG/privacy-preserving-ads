@@ -329,5 +329,5 @@ The proposals we provide comparisons to below is not intended to be exhaustive. 
 [Open a new issue](https://github.com/WICG/privacy-preserving-ads/issues/new?labels=PARAKEET&template=parakeet.md&title=%5BPARAKEET%5D+%3CTITLE+HERE%3E)
 
 See open GitHub Issues: <a href="https://github.com/WICG/privacy-preserving-ads/labels/PARAKEET">
-    ![GitHub issues by-label](https://img.shields.io/github/issues/WICG/privacy-preserving-ads/labels/PARAKEET?label=issues)</a> |
+    ![GitHub issues by-label](https://img.shields.io/github/issues/WICG/privacy-preserving-ads/PARAKEET?label=issues)</a> |
     
