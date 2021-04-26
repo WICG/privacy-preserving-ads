@@ -24,7 +24,8 @@ Feedback is welcome in the form of github issues and via discussions in existing
   - [Other considerations](#other-considerations)
     - [Model selection and training](#model-selection-and-training)
     - [User device compute for the browser service](#user-device-compute-for-the-browser-service)
-    - [3-Party Computation for performance](#3-party-computation-for-performance)
+    - [Three-party computation (3PC) to improve performance](#three-party-computation-3pc-to-improve-performance)
+        - [Performance of linear/logisitic regression using 3PC EzPC/CrypTFlow (4 threads, 32-bit)](#performance-of-linearlogisitic-regression-using-3pc-ezpccryptflow-4-threads-32-bit)
     - [Reporting](#reporting)
   - [Relation to other proposals](#relation-to-other-proposals)
     - [Dovekey auction using secure compute](#dovekey-auction-using-secure-compute)
@@ -250,8 +251,8 @@ Model training is out of scope for this proposal but we anticipate that ad serve
 ### User device compute for the browser service 
 We are not currently developing proposals that directly leverage the users' browser for computation related to ad serving. Due to the need to evaluate hundreds of ads per ad impression, we believe that meeting acceptable goals on the impact to client bandwidth and device resources would necessitate too many restrictions for effective ad servicing and subsequent monetization. Instead, we believe that the browser service is currently better positioned to handle this workload. We will continue to look for optimization opportunities that allow reducing the role of the browser service in the future. Additionally, we believe there is possibly a model where a three-party secure compute system, where the browser service participates in reducing computation complexity, without needing to obtain user or ad information.
 
-### 3-Party Computation for Performance Improvement
-The design consideration of 3PC secure compute, where non-colluding helper party adds compute resources to support function evaluation could greatly reduce computational complexity and bandwidth requirements. We think that this is a viable option if the right incentives are created for such party to work in the setup. We compute performance of such setup to illustrate benefits in terms of time, memory requirement and communication bandwidth of same `N` variables input. 
+### Three-party computation (3PC) to improve performance
+The design consideration of 3PC secure compute, where a non-colluding helper party adds compute resources to support function evaluation, could greatly reduce computational complexity and bandwidth requirements. We believe that this is a viable option if the right incentives are created for such a party to participate in the setup. We compute the performance of such a setup to illustrate benefits in terms of time, memory requirements, and communication bandwidth of the same `N` input variables. 
 
 ##### Performance of linear/logisitic regression using 3PC EzPC/CrypTFlow (4 threads, 32-bit)
 | N    | Time (ms) | Client Total Comm (MiB) | Server Total Comm (MiB) | Helper Total Comm (MiB) | Peak Mem Client (MiB) | Peak Mem Server (MiB) | Peak Mem Helper (MiB) |
