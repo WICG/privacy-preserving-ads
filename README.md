@@ -1,4 +1,7 @@
 This is the repository for Privacy Preserving Ads proposals
 
-* [PARAKEET](Parakeet.md)
-* [MaCAW](MACAW.md)
+# Proposals
+
+* [PARAKEET](https://github.com/WICG/privacy-preserving-ads/blob/main/Parakeet.md)
+  * [PARAKEET polyfill](/Polyfill)
+* [MaCAW](https://github.com/WICG/privacy-preserving-ads/blob/main/MACAW.md)
