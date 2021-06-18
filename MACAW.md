@@ -24,6 +24,8 @@ Feedback is welcome in the form of github issues and via discussions in existing
   - [Other considerations](#other-considerations)
     - [Model selection and training](#model-selection-and-training)
     - [User device compute for the browser service](#user-device-compute-for-the-browser-service)
+    - [Three-party computation (3PC) to improve performance](#three-party-computation-3pc-to-improve-performance)
+        - [Performance of linear/logisitic regression using 3PC EzPC/CrypTFlow (4 threads, 32-bit)](#performance-of-linearlogisitic-regression-using-3pc-ezpccryptflow-4-threads-32-bit)
     - [Reporting](#reporting)
   - [Relation to other proposals](#relation-to-other-proposals)
     - [Dovekey auction using secure compute](#dovekey-auction-using-secure-compute)
@@ -249,6 +251,16 @@ Model training is out of scope for this proposal but we anticipate that ad serve
 ### User device compute for the browser service 
 We are not currently developing proposals that directly leverage the users' browser for computation related to ad serving. Due to the need to evaluate hundreds of ads per ad impression, we believe that meeting acceptable goals on the impact to client bandwidth and device resources would necessitate too many restrictions for effective ad servicing and subsequent monetization. Instead, we believe that the browser service is currently better positioned to handle this workload. We will continue to look for optimization opportunities that allow reducing the role of the browser service in the future. Additionally, we believe there is possibly a model where a three-party secure compute system, where the browser service participates in reducing computation complexity, without needing to obtain user or ad information.
 
+### Three-party computation (3PC) to improve performance
+The design consideration of 3PC secure compute, where a non-colluding helper party adds compute resources to support function evaluation, could greatly reduce computational complexity and bandwidth requirements. We believe that this is a viable option if the right incentives are created for such a party to participate in the setup. We compute the performance of such a setup to illustrate benefits in terms of time, memory requirements, and communication bandwidth of the same `N` input variables. 
+
+##### Performance of linear/logisitic regression using 3PC EzPC/CrypTFlow (4 threads, 32-bit)
+| N    | Time (ms) | Client Total Comm (MiB) | Server Total Comm (MiB) | Helper Total Comm (MiB) | Peak Mem Client (MiB) | Peak Mem Server (MiB) | Peak Mem Helper (MiB) |
+|------|-----------|------------------|---------------------|----------------------|----------------------|----------------------|----------------------|
+| 400  | 12.60     | 2.44             | 2.45                | 0.003                | 17.39                | 17.44                | 17.46                |
+| 1600 | 677.57    | 39.08            | 39.09               | 0.012                | 148.38               | 148.02               | 128.84               |
+| 3200 | 1661.01   | 156.29           | 156.32              | 0.024                | 558.01               | 558.57               | 482.54               |
+
 ### Reporting
 We propose to leverage similar approach to [aggregated measurement](https://github.com/WICG/conversion-measurement-api/blob/main/AGGREGATE.md) for reporting. We will share additional details and enhancements in future proposals for reporting.
 
@@ -265,7 +277,7 @@ We propose to leverage similar approach to [aggregated measurement](https://gith
 We proposed a generic secure compute-based setup for DSP bid functions and SSP auction which requires a significant number of rounds of communication between the browser service and ad servers. Careful consideration is needed for the design of the hosting model to optimize for communication latency and bandwidth in very large query per second setups such as web advertising.
 
 ### Partial encryption for user features or model parameters 
-Current proposal assumes encryption of `<contextual information, user features>` and model parameters. Partially revealing values could reduce protocol cost and should be explored further.
+Current proposal assumes encryption of `<contextual information, user features>` and model parameters. Partially revealing values could reduce protocol cost and should be explored further. We will publish additional details for such optimization in future.
 
 [Open a new issue](https://github.com/WICG/privacy-preserving-ads/issues/new?labels=MaCAW&template=MACAW.md&title=%5BMaCAW%5D+%3CTITLE+HERE%3E)
 
