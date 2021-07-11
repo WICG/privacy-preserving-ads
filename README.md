@@ -1,7 +1,8 @@
-This is the repository for Privacy Preserving Ads proposals
+This is the repository for various privacy-preserving ads proposals.
 
 # Proposals
 
-* [PARAKEET](https://github.com/WICG/privacy-preserving-ads/blob/main/Parakeet.md)
+* [PARAKEET: Private and Anonymized Requests for Ads that Keep Efficacy and Enhance Transparency](Parakeet.md)
   * [PARAKEET polyfill](https://github.com/microsoft/PARAKEET/tree/main/Polyfill)
-* [MaCAW](https://github.com/WICG/privacy-preserving-ads/blob/main/MACAW.md)
+* [MaCAW: Multi-party Computation of Ads on the Web](MACAW.md)
+* [Masked LARK: Masked Learning, Aggregation and Reporting worKflow](MaskedLARK.md)
