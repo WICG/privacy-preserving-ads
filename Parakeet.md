@@ -8,13 +8,19 @@ Feedback is welcome in the form of github issues and via discussions in existing
    * [Introduction](#introduction)
    * [Overview](#overview)
    * [Use Cases](#use-cases)
+     * [Multi-Tiered Auctions/Direct/Header Bidding Integration](#multi-tiered-auctionsDirectHeader-Bidding-Integration)
+     * [Multiple Ad Slots for a Page](#multiple-ad-slots-for-a-page)
    * [Scope](#scope)
    * [API flow for ad serving](#api-flow-for-ad-serving)
      * [Interest-Based Ad Targeting](#interest-based-ad-targeting)
      * [Ad Interest Privacy and Anonymization](#ad-interest-privacy-and-anonymization)
      * [Ad Request with Anonymization](#ad-request-with-anonymization)
      * [Potential API shape](#potential-api-shape)
-       * [Conversion Measurement](#conversion-measurement)
+       * [Meaningful Parameters](#meaningful-parameters)
+       * [Reporting Integration](#reporting-integration)
+         * [Win Reporting](#win-reporting)
+         * [Click/View Reporting](#clickview-reporting)
+         * [Conversion Reporting](#conversion-reporting)
        * [Data flows](#data-flows)
    * [User Controls](#user-controls)
    * [Key Considerations and Feasibility](#key-considerations-and-feasibility)
@@ -77,6 +83,129 @@ The advertiser matches an ad with a user based on one or more of the following: 
    * [In-market audience](https://github.com/w3c/web-advertising/blob/main/support_for_advertising_use_cases.md#audience-definition): requires a propensity score that estimates the likelihood the user will click or convert based on their semantic representation. 
    * [Contextual targeting](https://github.com/w3c/web-advertising/blob/main/support_for_advertising_use_cases.md#display-and-target-environment): the targeting of ads based on display, device or other environmental context of the user. 
 
+### Multi-Tiered Auctions/Direct/Header Bidding Integration
+There may be out-of-band auctions such as direct bidding and header bidding that
+need to integrate with a PARAKEET ad request. These sellers may want to display
+a PARAKEET-based ad only if it would result in a better ad (from the perspective
+of the seller) than the other ad request flows.
+
+As a PARAKEET auction happens off-device, the seller should first handle any
+out-of-band auctions in order to establish their bid floor value.
+
+When creating the AdRequestConfig to use during the createAdRequest call,
+the seller can provide an optional bidFloor property along with the other
+AdRequestConfig.adProperties values. This information will be used in the
+server-side bidding process. If the winning PARAKEET ad exceeds the bid
+floor, it will be returned. Otherwise, the createAdRequest promise will be
+rejected as an indication to the seller to utilize the out of band auction
+winning creative.
+
+##### Example:
+```javascript
+// directBidFloor = $1.23 based on custom seller logic in-page.
+let directBidFloor = SellersCustomDirectBidAuction();
+
+// Make PARAKEET ad request to ad-network and determine which ad to use.
+navigator.createAdRequest({
+   ...
+   "adProperties": [{
+      "orientation": "landscape",
+      "size": "medium",
+      "slot": "div-xyz-abc",
+      "lang": "en-us",
+      "adtype": "image/native"
+      "bidFloor": directBidFloor
+   }],
+   ...
+}).then(payload_uri => {
+  // PARAKEET ad out-bid bidFloor, use payload_uri to display ad.
+}).catch(e => {
+  // Request failed to win auction, use directBid ad.
+});
+
+```
+
+##### K-Anonymity & Bid Floor
+In order to privatize the bidFloor parameter the bid floor may be artificially
+reduced by the PARAKEET service to a value that has been commonly sent by other
+users.
+
+For example, if the seller provides a unique, never-before-seen bid floor such
+as 3.12, the service may alter it to 3 or another suitable, lower value such that
+it will pass a reasonably k-anonymity bar.
+
+If lowering occurs and the bid of the winning PARAKEET ad satisfies the lowered
+bid floor value but not the true bid floor value, then PARAKEET may drop the
+winning ad by returning a response to the browser that indicates PARAKEET was
+unable to retrieve an ad that met the pre-declared floor.
+
+
+### Multiple Ad Slots for a Page
+A seller may often want to avoid filling multiple ad slots on a single page when
+it’s undesirable to have a common creative for multiple slots on the same page.
+In a single ad request, due to the unlinkable nature of discrete requests this
+is not possible because the ad network cannot identify if two independent requests
+are for the same page or not.
+
+In order to support multiple slots the createAdRequest and AdRequestConfig have
+an adProperties param that supports an array of AdProperties[] where 1 or more
+are required at request time.
+
+##### Privacy/Linkage Concerns
+Anonymization and privacy functions will be applied to the set of AdProperties
+along with other relevant ad request properties and interest groups. This means
+that the tradeoff for being able to bid on sets of ads together carries more risk
+of tripping over anonymization limits due to a higher chance of the aggregate ad
+request being more unique. In order to account for this, it is recommended that
+requests be made for reasonably common sets of ad groups that large numbers of
+users will see the same/similar sets of requests.
+
+###### Example:
+A page has three types of designs where it may request one, two, or three ads
+for a panel. Rather than making three separate requests for the 1st, 2nd, and
+3rd ads, it may be advantageous for the page to always request three ads to fill
+these slots in the panel. At rendering time, one or more ads could be discarded
+depending on the current layout to avoid unwanted views/impressions but still
+enable a more common ad request to properly re-target and serve meaningful ads.
+
+
+##### Bid Floor Integration/Partial Fulfillment
+The bidFloor property is part of the AdProperties configuration and can be unique
+per requested ad. This allows for tiered requests such as “Slot 1 has a bid-floor
+of A”, Slot 2 has a bid floor of B”, etc.
+
+In the case where a privatized request for multiple slots only fills a subset of
+slots the non-filled slots will be filled with null values.
+
+
+##### Example:
+```javascript
+// Make PARAKEET ad request to ad-network for 2 ads.
+navigator.createAdRequest({
+   ...
+   "adProperties": [{
+      "orientation": "portrait",
+      "size": "large",
+      "slot": "Slot1",
+      "lang": "en-us",
+      "adtype": "image/native"
+      "bidFloor": 1.13
+   },{
+      "orientation": "landscape",
+      "size": "medium",
+      "slot": "Slot2",
+      "lang": "en-us",
+      "adtype": "image/native"
+      "bidFloor": 1.23
+   }],
+   ...
+}).then(payload_uris => {
+  // PARAKEET retrieved ads
+  // payload_uris[0] -> Slot1 result
+  // payload_uris[1] -> Slot2 result
+});
+
+```
 
 ## Scope
 
@@ -132,49 +261,86 @@ An ad network will have the opportunity to run optimal ad auction-based click an
 
 ### Potential API shape
 The ad request configuration will be created by invoking a JavaScript API in the publisher's page:
-```
+```javascript
 const adRequestConfig = {
-    'proxied-anonymizing-origin': 'https://ad-network.example',
-    'ad-properties': {
-      orientation: 'landscape',
-      size: 'medium',
-      slot: 'div-xyz-abc',
-      lang: 'en-us',
-      adtype: 'image/native'
-    },
-    'publisher-code':'10931',
-    'publisher-ad-unit': 'publisher_ad_location_1',
+    'proxiedAnonymizingOrigin': 'https://ad-network.example',
+    'reportLogicUrl': 'https://seller.example/scripts/reporting_worklet.js',
+    'adProperties': [{
+        'orientation': 'landscape',
+        'size': 'medium',
+        'slot': 'div-xyz-abc',
+        'lang': 'en-us',
+        'adtype': 'image/native',
+        'bidFloor': 1.23
+      },{
+        'orientation': 'portrait',
+        'size': 'long',
+        'slot': 'div-xyz-xyz',
+        'lang': 'en-us',
+        'adtype': 'image/native',
+        'bidFloor': 1.67
+      }, ...
+    ],
+    'publisherCode':'10931',
+    'publisherAdUnit': 'publisher_ad_location_1',
     'targeting': {
       'interests': ['music', 'sports']
       },
-      'geolocation': '[41.5, -81.7]'
+      'geolocation': { 'lat': 41.5, 'lon': -81.7}
     },
-    'anonymized-proxied-signals': ['coarse-geolocation', 'coarse-ua', 'targeting', 'user-ad-interests']
-    'fallback-source': 'https://ad-network.example/fallback-for-user-agents-that-do-not-support-proxied-request'
+    'anonymizedProxiedSignals': ['coarse-geolocation', 'coarse-ua', 'targeting', 'user-ad-interests']
+    'fallbackSource': 'https://ad-network.example/fallback-for-user-agents-that-do-not-support-proxied-request'
 };
 
 const adRequestPromise = navigator.createAdRequest(adRequestConfig);
 ```
-The returned `adRequestPromise` promise is _opaque_ and cannot be inspected or updated by the publisher page. The promise is then passed to a [Fenced Frame](https://github.com/shivanigithub/fenced-frame) as an [opaque source](https://github.com/shivanigithub/fenced-frame/blob/master/OpaqueSrc.md) which in turn processes the request and renders the returned ad.
+The returned `adRequestPromise` promise will reject if the request is
+unsuccessful and resolve with an array of _opaque_ URLs that cannot be inspected or
+updated by the publisher page. These URLs may then be passed to a
+[Fenced Frame](https://github.com/shivanigithub/fenced-frame) as an
+[opaque source](https://github.com/shivanigithub/fenced-frame/blob/master/OpaqueSrc.md)
+which in turn processes the request and renders the returned ad.
 
+#### Meaningful Parameters
 In this example, the meanings of the ad request configuration parameters are:
-* `proxied-anonymizing-origin`: The origin that the anonymizing service request the ad bundle from. A .well-known path, e.g. /.well-known/ad-request, will be queried by the service.
-* `ad-properties`: A set of properties whose names and values map to a well-known list of supported values and help inform the ad network of what type of ad to serve.
-* `publisher-code`: The number `10931` represents a specific publisher's identity registered with the ad network.
-* `publisher-ad-unit`: The string `publisher_ad_location_1` represents an ad unit/vertical that the publisher has registered with the ad network.
-* `targeting`: Contextual targeting information for the ad. A potential interest taxonomy for publisher context could be [IAB's taxonomy](https://www.iab.com/guidelines/audience-taxonomy/).
-   * `geolocation`: Geolocation info that the web site is aware of. For example, if the user is searching for travel information, their current device's approximate location may be less relevant than the location they are planning travel for.
-* `anonymized-proxied-signals`: Specifies what information should be added to the ad request by the anonymizing request service:
-   * `coarse-geolocation`: Geolocation info that is coarse enough to ensure that many users send the same geolocation signal. If present, it will use the value of the `targeting` attribute's `geolocation` value (making it more coarse as needed). If a value was not provided, it will send a location value based on signals sourced from the device's OS location API or via a reverse IP lookup.
-   * `coarse-ua`: UA information that maps to the browser's brand and version.
-   * `targeting`: The targeting information provided by the `targeting` attribute.
-   * `user-ad-interests`: Ad interest signals previously determined and set by the ad network, including when they were previously on a different site.
- * `fallback-source`: If the UA doesn't support the anonymized ad request flow, either because of a global decision, a local user decision, or due to an infrastructure outage, it will fall back to loading via the URL in this value.
+- `proxiedAnonymizingOrigin`: The origin that the anonymizing service request
+the ad bundle from. A .well-known path, e.g. /.well-known/ad-request, will be
+queried by the service.
+- `adProperties`: A set of properties whose names and values map to a well-known
+list of supported values and help inform the ad network of what type of ads to serve.
+The bidFloor property will influence server side bidding for each requested ad slot.
+- `reportLogicUrl`: An URL specifying the location of a javascript worklet containing
+reporting logic to run upon request completion.
+- `publisherCode`: The number `10931` represents a specific publisher's identity
+registered with the ad network.
+- `publisherAdUnit`: The string `publisher_ad_location_1` represents an ad
+unit/vertical that the publisher has registered with the ad network.
+- `targeting`: Contextual targeting information for the ad. A potential interest
+   taxonomy for publisher context could be [IAB's taxonomy](https://www.iab.com/guidelines/audience-taxonomy/).
+   - `geolocation`: Geolocation info that the web site is aware of. For example,
+   if the user is searching for travel information, their current device's
+   approximate location may be less relevant than the location they are planning
+   travel for.
+- `anonymizedProxiedSignals`: Specifies what information should be added to
+the ad request by the anonymizing request service:
+   - `coarse-geolocation`: Geolocation info that is coarse enough to ensure
+   that many users send the same geolocation signal. If present, it will use
+   the value of the `targeting` attribute's `geolocation` value (making it
+   more coarse as needed). If a value was not provided, it will send a location
+   value based on signals sourced from the device's OS location API or via a
+   reverse IP lookup.
+   - `coarse-ua`: UA information that maps to the browser's brand and version.
+   - `targeting`: The targeting information provided by the `targeting` attribute.
+   - `user-ad-interests`: Ad interest signals previously determined and set
+   by the ad network, including when they were previously on a different site.
+- `fallbackSource`: If the UA doesn't support the anonymized ad request flow,
+either because of a global decision, a local user decision, or due to an
+infrastructure outage, it will fall back to loading via the URL in this value.
 
 The service can append user ad interests to the resulting request:
 
 ```
-user-ad-interests=[ad network-specific interests the browser and service maintain]
+joinedGroups=[ad network-specific interests the browser and service maintain]
 ```
 
 In this example, assuming the user ad interests are appended, the service would end up making an ad bundle request to:
@@ -184,12 +350,111 @@ https://ad-network.example/.well-known/ad-bundles?coarse-geolocation=47.66,-122.
 
 If the full set of information that would be carried by the service ads is too unique (as determined by having a minimum number of users' browsers trying to request an ad with the same set of signals within some reasonable time period), the service will drop the user-ad-interests attribute entirely and pass along the request using the information provided directly by the page (i.e., all of the information in the URL could have been generated by the site and loaded via a normal iframe).
 
-#### Conversion Measurement
-These are some early thoughts about how a trusted service, such as PARAKEET, can incorporate conversion measurement and reporting on the web. 
+#### Reporting Integration
+In order to support reporting with PARAKEET, the proposed mechanisms described
+in the [Conversion Measurement API](https://github.com/WICG/conversion-measurement-api)
+to register attributions will initially be supported as-is.
 
-When a user clicks on an ad, multiple involved parties such as the ad network and advertiser want to be able to track that click to understand ad campaign performance metrics such as conversion rates vs. impressions, value of conversion, publishers that lead to optimal conversion rates, users that are likely to convert, etc. Some proposals have been made, such as [Private Click Measurement](https://privacycg.github.io/private-click-measurement/) and [Click Through Conversion Measurement Event-Level API](https://github.com/WICG/conversion-measurement-api), to reduce the joinability of click events cross-party via techniques such as constraints on click-related data entropy, noise & local differential privacy, random time delays, and throttles. Additionally, there are proposals for a [Multi-Browser Aggregation Service](https://github.com/WICG/conversion-measurement-api/blob/master/SERVICE.md) that provides data and analytics to sites about conversion flow in a more privacy protective manner.
+For instance, attributionSources via anchor HTML element and
+registerAttributionSource API can be used as-is as well as the HTTP redirect-based
+and window.attributionReporting.triggerAttribution(...) API to trigger conversions of these
+sources.
 
-We are considering combining those approaches by leveraging the trusted relationship proposed by the PARAKEET service to enable increased fidelity of conversion metrics while reducing user identifiability. One potential approach is for the PARAKEET service to proxy communication between the browser and related parties during a click event, reducing the ability for user to be uniquely identified based on data such as IP address, UA, etc. Additionally, PARAKEET could provide party-specific clickIDs in the click event flow and an endpoint for ad networks and advertisers to report back detailed information on the conversion progress via those clickIDs. This detailed understanding, at a global scale, would allow the service to leverage techniques such as global differential privacy for generating privacy protecting reports for the involved advertiser, ad networks, and publishers while still improving user privacy.
+The specified navigator.registerAdBeacon and navigator.reportEvent described in
+[Fenced Frames Ads Reporting](https://github.com/WICG/turtledove/blob/main/Fenced_Frames_Ads_Reporting.md)
+can be leveraged as-is to provide non-conversion reporting from within the
+winning creative.
+
+A seller-provided worklet (implementing a reportResult method) can be specified
+to perform seller specific reporting tasks. The browser will also call
+navigator.registerAdBeacon on behalf of the buyer with provided details from the
+ad auction on the PARAKEET service. Minor modification of Conversion Measurement API,
+as outlined in the [MASKED Lark proposal](MaskedLARK.md), are also highlighted to
+support more robust aggregate reporting.
+
+###### Seller 'ReportResult' Worklet
+As part of the AdRequestConfig a seller may specify the **reportLogicUrl**
+parameter to indicate the location of their reporting worklet script.
+
+The browser enforces no constraints on who authors this worklet (it might be the
+seller, publisher, or other parties providing the functionality); it's up to the
+seller site to decide what logic to pass in. However the logic will be executed
+in an isolated worklet environment that cannot interact with the current page.
+
+The worklet provided by this URL, if it exists, is expected to define a
+reportResult(AdRequestConfig, AdMetadata) method which the browser will call,
+passing in PARAKEET-specific information upon auction completion.
+
+###### Buyer RegisterAdBeacon Events
+As part of the auction response to the PARAKEET service the SSP may specify
+a set of events to register in conjunction with the winning creative. These
+events should match the format used in a call to
+[navigator.registerAdBeacon](https://github.com/WICG/turtledove/blob/main/Fenced_Frames_Ads_Reporting.md#parameters-1)
+
+The browser will invoke registerAdBeacon on behalf of the buyer in the event
+of a successfull ad request.
+
+
+##### Win Reporting
+For wins to be reported the seller has an opportunity to perform any reporting logic
+such as registering an attribution source, registering an ad beacon, or calling
+any other available event or aggregate reporting API inside of their ReportResult
+worklet.
+
+For each successfull ad request the browser will invoke any available ReportResult
+method with the original adRequestConfig associated with the adRequest and any service
+provided adMetadata. This may be combined with page specific context such as
+topWindowHostName and may contain information such asa the winning bid price or other
+information. This is exposed only in the sellers isolated worklet environment during a
+call to reportResult.
+
+The buyer may perform any reporting they require in their auction flows during the
+server-side auction using the privatized request data available in the ad request.
+Additionally they may provide a list of events to register for to be notified of
+any creative specific events occuring inside the FencedFrame such as impressions,
+play duration, or other relevant events.
+
+The creative content within the provided ad bundle can call the proposed
+[navigator.reportEvent](https://github.com/WICG/turtledove/blob/main/Fenced_Frames_Ads_Reporting.md#reportevent)
+method as required to generate specific events with an eventType and eventData
+while indicating if the buyer, seller, or both should receive this event. The
+browser will correlate these events with any registered ad beacons for the
+buyer/seller and eventType then send the eventData via HTTP POST to the specified
+URL. This will eventually be removed or altered to ensure the report is sent via
+aggregated reporting instead of a direct POST Fetch request.
+
+PARAKEET will utilize this method as specified to enable reporting from within the
+fenced frame. Both the reportEvent and registerAdBeacon methods allow buyers to
+receive their creative reporting events. 
+
+
+##### Click/View Reporting
+In order to satisfy conversion reporting the Conversion Measurement API specifies
+mechanisms to record attribution sources with both
+[click-through](https://github.com/WICG/conversion-measurement-api/blob/main/event_attribution_reporting_clicks.md)
+and
+[view-through](https://github.com/WICG/conversion-measurement-api/blob/main/event_attribution_reporting_views.md)
+ mechanisms. Both of these mechanisms are largely independent of the mechanism used
+to serve the ad (FLEDGE, PARAKEET, or others, e.g. direct-sold). As a result, the
+attributes added to anchor elements and the JS registerAttributionSource method can
+be utilized as proposed and can be used from either the creative WebBundle or the
+seller reportResult method as appropriate.
+
+##### Conversion Reporting
+As part of the Conversion Measurement API, two trigger mechanisms are provided to
+convert a registered attribution source to a conversion event-level report. An
+HTTP redirect to a .well-known URL may be created via fetch() or other mechanisms
+such as a conversion pixel img element embedded in a document. Alternatively, a
+conversion for aggregate reporting can trigger on an associated attribution source
+by calling window.attributionReporting.triggerAttribution.
+
+Similar to attribution sources these mechanisms are largely independent of method
+used to serve the ads and thus can be used as-is for PARAKEET flows.
+
+##### Aggregate Reporting
+In order to integrate with aggregate reporting, the
+[MASKED Lark proposal](MaskedLARK.md) goes into further detail about aggregate reporting.
+
 
 #### Data flows
 It is important to note that ad serving is enabled with privacy-preserving anonymity. Refer to the call sequence and high-level interaction image for dataflow and integration. These diagrams are for high-level illustration purposes and do not comprehensively cover every aspect of the proposal.
@@ -273,6 +538,7 @@ A privacy cost analysis of these two different proposals should be compared exte
    Some users may not be comfortable with the data shared with the service; reasonable user controls that allow users to control the data flows is likely desirable.
 
    It's critical that maintainers of such a service follow best security and privacy practices to ensure unintentional data leakages do not happen. Technical solutions to reduce the visibility the service has into individual user data should be explored; multi-party computation schemes are of particular interest and will continue to be explored.
+
 
 ## Alternative Solutions
 Proposals to address web advertising use cases are many. The Web Advertising Business Group's repo has a [summary of various use cases and current proposals](https://github.com/w3c/web-advertising/blob/master/support_for_advertising_use_cases.md) that address each of them.
