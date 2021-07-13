@@ -144,6 +144,10 @@ const adRequestConfig = {
     },
     'publisher-code':'10931',
     'publisher-ad-unit': 'publisher_ad_location_1',
+    'requirements': {
+      'price-floor': 1.25,
+      'max-priority': 2
+    },
     'targeting': {
       'interests': ['music', 'sports']
       },
@@ -162,6 +166,9 @@ In this example, the meanings of the ad request configuration parameters are:
 * `ad-properties`: A set of properties whose names and values map to a well-known list of supported values and help inform the ad network of what type of ad to serve.
 * `publisher-code`: The number `10931` represents a specific publisher's identity registered with the ad network.
 * `publisher-ad-unit`: The string `publisher_ad_location_1` represents an ad unit/vertical that the publisher has registered with the ad network.
+* `requirements`: Thresholds the ad request must meet in order to qualify to serve. Can be used to compare against available direct sold ads. All requirements must be met.
+   * `price-floor`: the minimum price the ad must meet in order to quaify to serve.
+   * `max-priority`: the maximum priority of an ad that would be considered.
 * `targeting`: Contextual targeting information for the ad. A potential interest taxonomy for publisher context could be [IAB's taxonomy](https://www.iab.com/guidelines/audience-taxonomy/).
    * `geolocation`: Geolocation info that the web site is aware of. For example, if the user is searching for travel information, their current device's approximate location may be less relevant than the location they are planning travel for.
 * `anonymized-proxied-signals`: Specifies what information should be added to the ad request by the anonymizing request service:
