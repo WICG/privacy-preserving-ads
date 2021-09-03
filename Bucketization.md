@@ -48,11 +48,12 @@ details are deferred to following sections.
 
 ### Third-Party Cookies
 Existing uses of third party cookies has raised a lot of privacy concerns. A
-website $A_1$ that a user is visiting installs a third-party cookie belonging to
-the website $B$. Then website $B$ would be able to track the user's activities
-and provide personalized web service based on the identifier and device ID
-stored in the cookie when the user is browsing websites $A_2,A_3...,A_n$. For
-example, an advertiser is able to analyze users' habits based on their browser
+website _A<sub>1</sub>_ that a user is visiting installs a third-party cookie
+belonging to the website _B_. Then website _B_ would be able to track the user's
+activities and provide personalized web service based on the identifier and
+device ID stored in the cookie when the user is browsing websites
+_A<sub>1</sub>, A<sub>2</sub>, A<sub>3</sub>..., A<sub>n</sub>_. For example, an
+advertiser is able to analyze users' habits based on their browser
 histories and then publish advertisements that the users might be interested in.
 
 Currently, there is very little control over who collects this data or how it
@@ -155,17 +156,19 @@ aggregation server are owned by the same entity.  Using 3 rather than 2
 aggregation servers allows us to design more efficient protocols.
 
 ### Two-Party Secret Sharing
-We use the additive 2-out-of-2 secret-sharing in our protocol.  Let $x$ be an
+We use the additive 2-out-of-2 secret-sharing in our protocol.  Let _x_ be an
 element in an algebraic structure such as group or ring known by the browser.
-(For example, $x$ is an integer between $0$ and $MAX$. Alternatively, $x$ could
-be a bitstring in $\{0,1\}^\ell$ .) To share $x$ to aggregation servers $S_1$
-and $S_2$, the browser first samples a random element $x_1=r$ in the same
-algebraic structure and computes $x_2=x+r$.  Here the addition '$+$' generally
-represent the addition in these special algebraic structures.  (In our examples,
-this would mean computing $x_2=x+r$ mod $MAX$ or computing $x_2 = x$ XOR $r$
-respectively.) The browser then sends $x_1$ privately (e.g. over TLS) to server
-$S_1$ and $x_2$ privately to server $S_2$. The randomness $r$ prevents $x_1$ or
-$x_2$ from leaking any information about $x$.
+(For example, _x_ is an integer between _0_ and _MAX_. Alternatively, _x_ could
+be a bitstring in ![\{0,1\}^\ell](http://www.sciweavers.org/tex2img.php?eq=%5C%7B0%2C1%5C%7D%5E%5Cell&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).) To share _x_ to aggregation servers _S<sub>1</sub>_
+and _S<sub>2</sub>_, the browser first samples a random element
+_x<sub>1</sub>=r_ in the same algebraic structure and computes
+_x<sub>2</sub>=x+r_.  Here the addition '_+_' generally represent the addition in
+these special algebraic structures.  (In our examples, this would mean computing
+_x<sub>2</sub>=x+r mod MAX_ or computing _x<sub>2</sub>=x XOR r_ respectively.)
+The browser then sends _x<sub>1</sub>_ privately (e.g. over TLS) to server
+_S<sub>1</sub>_ and _x<sub>2</sub>_ privately to server _S<sub>2</sub>_. The
+randomness _r_ prevents _x<sub>1</sub>_ or
+_x<sub>2</sub>_ from leaking any information about _x_.
 
 ![2-party secret share](diagrams/bucketization_secret_share.png)
 
@@ -214,8 +217,8 @@ of dummy records to each bucket, this will be equivalent to revealing a
 differentially private histogram.
 
 The key idea behind our protocol is as follows:
-1. Two of the aggregation servers (call them $S_1$ and $S_2$) will each hold a
-   list with one secret of each user's record.
+1. Two of the aggregation servers (call them _S<sub>1</sub>_ and
+   _S<sub>1</sub>_) will each hold a list with one secret of each user's record.
 
 2. Each of these two aggregation servers will add some dummy records for each
    bucket. The number of noise records are drawn from truncated Laplace
@@ -225,12 +228,12 @@ The key idea behind our protocol is as follows:
    other aggregation server.  Both of servers append these dummy record shares
    to the end of their share lists.
 
-3. With the help of the 3rd aggregation server, $S_1$ and $S_2$ will perform a
-   secret shared shuffle as a result of which they obtain shares of the permuted
-   records, including the dummy records.  Note that it is now impossible for any
-   of the parties to tell which records correspond to dummy records vs real
-   records, or where any of the original real records ended up in the list.
-   Pictorially, this looks like the below diagram:
+3. With the help of the 3rd aggregation server, _S<sub>1</sub>_ and
+   _S<sub>2</sub>_ will perform a secret shared shuffle as a result of which
+   they obtain shares of the permuted records, including the dummy records.
+   Note that it is now impossible for any of the parties to tell which records
+   correspond to dummy records vs real records, or where any of the original
+   real records ended up in the list.Pictorially, this looks like the below diagram:
    ![dp_shuffling](diagrams/bucketization_dp_shuffling.png)
 
 4. Now the parties can reveal the relevant bits from the resulting records,
@@ -250,12 +253,12 @@ achieves differential private histogram generation.
 ![aggregation](diagrams/bucketization_aggregation.png)
 
 The bucketization process put records in buckets according to some bits encoded
-in keys. For example, a feature of an ad campaign could be encoded in $t=10$
-bits of the keys, which points each record to one of $2^{t}=1024$ buckets.
+in keys. For example, a feature of an ad campaign could be encoded in _t=10_
+bits of the keys, which points each record to one of _2<sup>t</sup>=1024_.
 
 The protocol starts with secret-sharing of the information from browsers. The
-browser $B_i$ generates a record $\{k_i,v_i\}$ and its two secret shares
-$\{k_i^1,v_i^1\}$ and $\{k_i^2,v_i^2\}$. It sends the shares to the appropriate
+browser _B<sub>i</sub>_ generates a record ![\{k_i,v_i\}](http://www.sciweavers.org/tex2img.php?eq=%5C%7Bk_i%2Cv_i%5C%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and its two secret shares
+![\{k_i^1,v_i^1\}](http://www.sciweavers.org/tex2img.php?eq=%5C%7Bk_i%5E1%2Cv_i%5E1%5C%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and ![\{k_i^2,v_i^2\}](http://www.sciweavers.org/tex2img.php?eq=%5C%7Bk_i%5E2%2Cv_i%5E2%5C%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0). It sends the shares to the appropriate
 aggregation servers. (Alternatively, the browser can encrypt the shares and pass
 them through the reporting origin as described [above](#system).)
 
@@ -263,34 +266,33 @@ The reporting origin chooses a set of shares to aggregate and a set of bit
 positions to bucketize on.
 
 The next step is to achieve *differential privacy* by mixing dummy records in
-the dataset. For each bucket $B_i$, $S_1$ and $S_2$ each independently sample
-noise $y_i^1$ and $y_i^2$ from truncated and discretized Laplace distribution
-with expectation of $s$ and domain $[0,2s]$, where $s$ is a parameter that
-depends on the desired DP privacy budget $\epsilon$. For $j\in \{1,2\}$, $S_j$
-generates $y_i^j$ dummy records belonging the bucket $B_i$. Then they will
-secret share these dummy records, and append them at the end of the dataset.
-At this moment, the dataset consists of $n$ authentic records and $n'$ dummy
-records.
+the dataset. For each bucket _B<sub>i</sub>_, _S<sub>1</sub>_ and _S<sub>2</sub>_ each independently sample
+noise ![y_i^1](http://www.sciweavers.org/tex2img.php?eq=y_i%5E1&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and ![y_i^2](http://www.sciweavers.org/tex2img.php?eq=y_i%5E2&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) from truncated and discretized Laplace distribution
+with expectation of _s_ and domain _[0,2s]_, where _s_ is a parameter that
+depends on the desired DP privacy budget _ϵ_. For _jϵ{1,2}_, _S<sub>j</sub>_
+generates ![y_i^j](http://www.sciweavers.org/tex2img.php?eq=y_i%5Ej&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) dummy records belonging the bucket _B<sub>i</sub>_. Then they will secret share these dummy records, and append
+them at the end of the dataset. At this moment, the dataset consists of _n_
+authentic records and _n'_ dummy records.
 
-Now the third party $S_3$ comes into the game for the *random shuffling*. Among
-$S_1$, $S_2$ and $S_3$, each pair of them jointly sample a random permutation,
-namely, $\pi_{12},\pi_{13},\pi_{23}$.  (This can be easily done using a
+Now the third party _S<sub>3</sub>_ comes into the game for the *random shuffling*. Among
+_S<sub>1</sub>_,  _S<sub>2</sub>_ and  _S<sub>3</sub>_, each pair of them jointly sample a random permutation,
+namely, _π<sub>12</sub>,π<sub>13</sub>,π<sub>23</sub>_.  (This can be easily done using a
 pseudorandom generator if each pair of servers shares a secret key initially.
 If not, one of each pair of parties can generate this seed and send it to the
 other.) They will execute an honest-majority three-party permutation protocol to
 permute the dataset with these permutations, as described
-[below](#honest-majority-three-party-shuffling). For an input record array $A$,
-it inputs the secret shares of $A$ and output secret shares of
-$\pi_{23}(\pi_{13}(\pi_{12}(A)))$. This step has 2 goals:
+[below](#honest-majority-three-party-shuffling). For an input record array _A_,
+it inputs the secret shares of _A_ and output secret shares of
+_π<sub>23</sub>(π<sub>13</sub>(π<sub>12</sub>(A)))_. This step has 2 goals:
 1. Mix the authentic records and dummy records, so the adversaries won't get an
    exact histogram COUNT after the bucketization.
 2. Mix the input records so it is not clear which is finally placed in which
    bucket.
 
-The basic protocol ends with two aggregation servers $S_1$ and $S_2$ revealing
-the $t$-bit feature encoded in the key to reconstruct the feature and determine
+The basic protocol ends with two aggregation servers _S<sub>1</sub>_ and _S<sub>2</sub>_ revealing
+the _t_-bit feature encoded in the key to reconstruct the feature and determine
 which bucket the item belongs in. Then they locally put the shares of records
-into one of $2^t$ buckets. The histogram for COUNT is direct.
+into one of _2<sup>t</sup>_ buckets. The histogram for COUNT is direct.
 
 At this point the parties can decide to subdivide one or more of these buckets
 based on another feature, by running this protocol again, or to compute the SUM
@@ -298,48 +300,50 @@ of one of more values for one or more of these buckets. (See discussion
 [below](#computing-sums))
 
 ### Honest-Majority Three-Party Shuffling
-Assume there are three parties $S_1,S_2,S_3$ and they do not collude with each
-other (do not share their secrets or transcripts of the protocol to others).
-Initially $S_1$ and $S_2$ have secret shares of the array of records $A$; we
-refer to their respective arrays of shares as by $A_1$ and $A_2$. Assume there's
-a pseudorandom generator $PRG(\cdot):\{0,1\}^\lambda \rightarrow \{0,1\}^*$
+Assume there are three parties _S<sub>1</sub>,S<sub>2</sub>,S<sub>3</sub>_ and
+they do not collude with each other (do not share their secrets or transcripts
+of the protocol to others).
+Initially _S<sub>1</sub>_ and _S<sub>2</sub>_ have secret shares of the array of records _A_; we
+refer to their respective arrays of shares as by _A<sub>1</sub>_ and _A<sub>2</sub>. Assume there's
+a pseudorandom generator ![PRG(\cdot):\{0,1\}^\lambda \rightarrow \{0,1\}^*](http://www.sciweavers.org/tex2img.php?eq=PRG%28%5Ccdot%29%3A%5C%7B0%2C1%5C%7D%5E%5Clambda%20%5Crightarrow%20%5C%7B0%2C1%5C%7D%5E%2A&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
 which inputs a seed and outputs a pseudorandom string.  
 
 We will also assume that each pair of parties shares a random seed, so
-$seed_{12}$ is shared by parties 1 and 2, $seed_{13}$ is shared by parties 1 and
+_seed<sub>12</sub>_ is shared by parties 1 and 2, _seed<sub>13</sub>_ is shared by parties 1 and
 3 etc.  These can be generated and shared once and then reused across many
 instances of the protocol, or at the start of each protocol one of the two
 parties can generate this seed at random and send it to the other party. 
 
 We describe the protocol below in terms of binary shares, so each entry in
-$A_1$, $A_2$ is a list of bits, and $A_1$ XOR $A_2= A$, however it can easily be
+_A<sub>1</sub>,A<sub>2</sub>_ is a list of bits, and
+_A<sub>1</sub> XOR A<sub>2</sub> = A_, however it can easily be
 applied to shares over other groups by replacing XOR with the appropriate group
 operations. (e.g. if the sharing is over numbers mod p, then the XORs would be
 replaced by addition and subtraction mod p.)
 
 #### Input
-$S_1$ holds $A_1$ and $S_2$ holds $A_2$.
+ _S<sub>1</sub>_ holds _A<sub>1</sub>_ and _S<sub>2</sub>_ holds _A<sub>2</sub>_.
 
 #### Protocol Execution
-For readability we use $\oplus$ to mean XOR.
+For readability we use ⊕ to mean XOR.
 
-+ Each party uses each of the two shared seeds to generate a random pad and a permutation.  So for each $i,j$ in \{1,2,3\}, party $S_i$ applies the PRG to seed $seed_{ij}$ (and a nonce if this seed is being reused) to generate a string $R_{ij}$ and a permutation $\pi_{ij}$.  So for example $S_1$ uses $seed_{12}$ to generate $R_{12}$ and $\pi_{12}$, and $seed_{13}$ to generate $R_{13}$ and $\pi_{13}$.
-+ $S_2$ computes
-  $B:=\pi_{23}(\pi_{12}(A_2)\oplus R_{12})\oplus R_{23}$, and sends $B$ to $S_1$.
-+ $S_1$ computes $C:=\pi_{12}(A_1)\oplus R_{12}$ and
-  sends $C$ to $S_3$.
++ Each party uses each of the two shared seeds to generate a random pad and a permutation.  So for each _i,j_ in _{1,2,3}_, party _S<sub>i</sub>_ applies the PRG to seed _seed<sub>ij</sub>_ (and a nonce if this seed is being reused) to generate a string _R<sub>ij</sub>_ and a permutation  _π<sub>ij</sub>_.  So for example _S<sub>1</sub>_ uses _seed<sub>12</sub>_ to generate _R<sub>12</sub>_ and _π<sub>12</sub>_, and _seed<sub>13</sub>_ to generate _R<sub>13</sub>_ and _π<sub>13</sub>_.
++ _S<sub>2</sub>_ computes
+  ![B:=\pi_{23}(\pi_{12}(A_2)\oplus R_{12})\oplus R_{23}](http://www.sciweavers.org/tex2img.php?eq=%24B%3A%3D%5Cpi_%7B23%7D%28%5Cpi_%7B12%7D%28A_2%29%5Coplus%20R_%7B12%7D%29%5Coplus%20R_%7B23%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), and sends _B_ to _S<sub>1</sub>_.
++ _S<sub>1</sub>_ computes ![C:=\pi_{12}(A_1)\oplus R_{12}](http://www.sciweavers.org/tex2img.php?eq=C%3A%3D%5Cpi_%7B12%7D%28A_1%29%5Coplus%20R_%7B12%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and
+  sends _C_ to _S<sub>3</sub>_.
 
 #### Output
-+ $S_1$  outputs $A_1':=\pi_{13}(B)\oplus R_{13}$.
-+ $S_3$ outputs $A_2':=\pi_{13}(\pi_{23}(C)\oplus R_{23})\oplus R_{13}$.
++ _S<sub>1</sub>_  outputs ![A_1':=\pi_{13}(B)\oplus R_{13}](http://www.sciweavers.org/tex2img.php?eq=A_1%27%3A%3D%5Cpi_%7B13%7D%28B%29%5Coplus%20R_%7B13%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
++ _S<sub>3</sub>_ outputs ![A_2':=\pi_{13}(\pi_{23}(C)\oplus R_{23})\oplus R_{13}](http://www.sciweavers.org/tex2img.php?eq=A_2%27%3A%3D%5Cpi_%7B13%7D%28%5Cpi_%7B23%7D%28C%29%5Coplus%20R_%7B23%7D%29%5Coplus%20R_%7B13%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
 
 #### Re-share
-Optionally, $S_3$ generates two secret shares of $A_2'$ and sends the shares to
-$S_1$ and $S_2$ respectively, and $S_1$ combines the share he receives with
-$A_1'$, so that now $S_1$ and $S_2$ have shares of the shuffled array.  This
+Optionally, _S<sub>3</sub>_ generates two secret shares of ![A_2'](http://www.sciweavers.org/tex2img.php?eq=A_2%27&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and sends the shares to
+_S<sub>1</sub>_ and _S<sub>2</sub>_ respectively, and _S<sub>1</sub>_ combines the share he receives with
+![A_1'](http://www.sciweavers.org/tex2img.php?eq=A_1%27&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), so that now _S<sub>1</sub>_ and _S<sub>2</sub>_ have shares of the shuffled array.  This
 puts the servers in place to run the protocol again, if e.g. they need to
 subdivide one of the buckets. Alternatively they could skip this resharing step
-and run the protocol switching the roles of $S_2$ and $S_3$.
+and run the protocol switching the roles of _S<sub>2</sub>_ and _S<sub>3</sub>_.
 
 
 ## Extensions
@@ -350,16 +354,16 @@ follows: first, when the browser prepares the record it must secret share the
 value in an appropriate sized group so that the sum of the values in a batch of
 records would never exceed the group size.  (For example, if each individual
 record value is expected to be capped at MAX, and the maximum batch of records
-we want to aggregate is $n$, then the shares are values between 0 and $n*MAX$.)
+we want to aggregate is _n_, then the shares are values between 0 and _n*MAX_)
 Then the aggregation servers simply locally add their shares of each value in
 the bucket to obtain shares of the sum.  Finally, they add additional Laplace
 noise, and then share the result to reconstruct the noisy sum.  
 
 However, this would have the undesirable result that a single misbehaving
 browser could encode a value much larger than MAX, and corrupt the entire sum.
-(For example, if it encodes a random value between 0 and $n*MAX$, then the
+(For example, if it encodes a random value between 0 and _n*MAX_, then the
 resulting sum will be completely random.)  Instead we'd like to guarantee that a
-single browser can affect the sum by at most $MAX$.  To guarantee this this we
+single browser can affect the sum by at most _MAX_.  To guarantee this this we
 must verify that the value in the record is in the correct range, which we can
 do using techniques from e.g.
 [Prio](https://www.usenix.org/system/files/conference/nsdi17/nsdi17-corrigan-gibbs.pdf)
