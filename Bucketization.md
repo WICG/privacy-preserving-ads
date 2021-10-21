@@ -340,7 +340,7 @@ For readability we use ⊕ to mean XOR.
 #### Re-share
 Optionally, _S<sub>3</sub>_ generates two secret shares of ![A_2'](http://www.sciweavers.org/tex2img.php?eq=A_2%27&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and sends the shares to
 _S<sub>1</sub>_ and _S<sub>2</sub>_ respectively, and _S<sub>1</sub>_ combines the share he receives with
-![A_1'](http://www.sciweavers.org/tex2img.php?eq=A_1%27&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), so that now _S<sub>1</sub>_ and _S<sub>2</sub>_ have shares of the shuffled array.  This
+![A_1'](bucketization-equation-images/A_1'.svg), so that now _S<sub>1</sub>_ and _S<sub>2</sub>_ have shares of the shuffled array.  This
 puts the servers in place to run the protocol again, if e.g. they need to
 subdivide one of the buckets. Alternatively they could skip this resharing step
 and run the protocol switching the roles of _S<sub>2</sub>_ and _S<sub>3</sub>_.
