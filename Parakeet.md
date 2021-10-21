@@ -481,7 +481,7 @@ This proposal describes a "service" that serves monetization scenarios in a priv
 
 To analyze the protection offered by differential privacy, let us assume that there are __U__ users of a given browser. Ad interests for each individual user _u_ can be represented as a binary vector of dimensions _N_. We share the ad interest vector for the user _u_ in each ad request while maintaining reasonable privacy guarantees. We propose to cluster all user ad interest vectors into _K_ clusters with differential privacy. At ad request time, for a user, we propose to share the nearest cluster centroid with probability _p_ and a random cluster centroid with probability _(1-p)/(K-1)_. It's a simple yet effective solution and can be shown to satisfy Differential Privacy for a given user's ad interest vectors with
 
-![equation](http://www.sciweavers.org/tex2img.php?eq=\epsilon%3Dln\frac{p%28K-1%29}{1-p}&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=)
+![\epsilon=ln\frac{p(K-1)}{1-p}](parakeet-equation-images/dp_equation.svg)
 
 The following are important considerations in the differential privacy analysis:
 * Ensuring that each ad interest or targeting dimension is not microtargeted is not sufficient. For example, one can adversarially encode identity for every individual on the earth using 33 binary ad interests without microtargeting and exchange it with other parties.
