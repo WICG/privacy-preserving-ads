@@ -159,7 +159,7 @@ aggregation servers allows us to design more efficient protocols.
 We use the additive 2-out-of-2 secret-sharing in our protocol.  Let _x_ be an
 element in an algebraic structure such as group or ring known by the browser.
 (For example, _x_ is an integer between _0_ and _MAX_. Alternatively, _x_ could
-be a bitstring in ![\{0,1\}^\ell](http://www.sciweavers.org/tex2img.php?eq=%5C%7B0%2C1%5C%7D%5E%5Cell&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).) To share _x_ to aggregation servers _S<sub>1</sub>_
+be a bitstring in ![\{0,1\}^\ell](bucketization-equation-images/alternate_bitstring_in.svg).) To share _x_ to aggregation servers _S<sub>1</sub>_
 and _S<sub>2</sub>_, the browser first samples a random element
 _x<sub>1</sub>=r_ in the same algebraic structure and computes
 _x<sub>2</sub>=x+r_.  Here the addition '_+_' generally represent the addition in
@@ -257,8 +257,8 @@ in keys. For example, a feature of an ad campaign could be encoded in _t=10_
 bits of the keys, which points each record to one of _2<sup>t</sup>=1024_.
 
 The protocol starts with secret-sharing of the information from browsers. The
-browser _B<sub>i</sub>_ generates a record ![\{k_i,v_i\}](http://www.sciweavers.org/tex2img.php?eq=%5C%7Bk_i%2Cv_i%5C%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and its two secret shares
-![\{k_i^1,v_i^1\}](http://www.sciweavers.org/tex2img.php?eq=%5C%7Bk_i%5E1%2Cv_i%5E1%5C%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and ![\{k_i^2,v_i^2\}](http://www.sciweavers.org/tex2img.php?eq=%5C%7Bk_i%5E2%2Cv_i%5E2%5C%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0). It sends the shares to the appropriate
+browser _B<sub>i</sub>_ generates a record ![\{k_i,v_i\}](bucketization-equation-images/aggregation_record.svg) and its two secret shares
+![\{k_i^1,v_i^1\}](bucketization-equation-images/secret_share_1.svg) and ![\{k_i^2,v_i^2\}](bucketization-equation-images/secret_share_2.svg). It sends the shares to the appropriate
 aggregation servers. (Alternatively, the browser can encrypt the shares and pass
 them through the reporting origin as described [above](#system).)
 
@@ -267,10 +267,10 @@ positions to bucketize on.
 
 The next step is to achieve *differential privacy* by mixing dummy records in
 the dataset. For each bucket _B<sub>i</sub>_, _S<sub>1</sub>_ and _S<sub>2</sub>_ each independently sample
-noise ![y_i^1](http://www.sciweavers.org/tex2img.php?eq=y_i%5E1&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and ![y_i^2](http://www.sciweavers.org/tex2img.php?eq=y_i%5E2&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) from truncated and discretized Laplace distribution
+noise ![y_i^1](bucketization-equation-images/y_i^1.svg) and ![y_i^2](bucketization-equation-images/y_i^2.svg) from truncated and discretized Laplace distribution
 with expectation of _s_ and domain _[0,2s]_, where _s_ is a parameter that
 depends on the desired DP privacy budget _ϵ_. For _jϵ{1,2}_, _S<sub>j</sub>_
-generates ![y_i^j](http://www.sciweavers.org/tex2img.php?eq=y_i%5Ej&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) dummy records belonging the bucket _B<sub>i</sub>_. Then they will secret share these dummy records, and append
+generates ![y_i^j](bucketization-equation-images/y_i^j.svg) dummy records belonging the bucket _B<sub>i</sub>_. Then they will secret share these dummy records, and append
 them at the end of the dataset. At this moment, the dataset consists of _n_
 authentic records and _n'_ dummy records.
 
@@ -304,8 +304,8 @@ Assume there are three parties _S<sub>1</sub>,S<sub>2</sub>,S<sub>3</sub>_ and
 they do not collude with each other (do not share their secrets or transcripts
 of the protocol to others).
 Initially _S<sub>1</sub>_ and _S<sub>2</sub>_ have secret shares of the array of records _A_; we
-refer to their respective arrays of shares as by _A<sub>1</sub>_ and _A<sub>2</sub>. Assume there's
-a pseudorandom generator ![PRG(\cdot):\{0,1\}^\lambda \rightarrow \{0,1\}^*](http://www.sciweavers.org/tex2img.php?eq=PRG%28%5Ccdot%29%3A%5C%7B0%2C1%5C%7D%5E%5Clambda%20%5Crightarrow%20%5C%7B0%2C1%5C%7D%5E%2A&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+refer to their respective arrays of shares as by _A<sub>1</sub>_ and _A<sub>2</sub>_. Assume there's
+a pseudorandom generator ![PRG(\cdot):\{0,1\}^\lambda \rightarrow \{0,1\}^*](bucketization-equation-images/pseudorandom_generator.svg)
 which inputs a seed and outputs a pseudorandom string.  
 
 We will also assume that each pair of parties shares a random seed, so
@@ -329,18 +329,18 @@ For readability we use ⊕ to mean XOR.
 
 + Each party uses each of the two shared seeds to generate a random pad and a permutation.  So for each _i,j_ in _{1,2,3}_, party _S<sub>i</sub>_ applies the PRG to seed _seed<sub>ij</sub>_ (and a nonce if this seed is being reused) to generate a string _R<sub>ij</sub>_ and a permutation  _π<sub>ij</sub>_.  So for example _S<sub>1</sub>_ uses _seed<sub>12</sub>_ to generate _R<sub>12</sub>_ and _π<sub>12</sub>_, and _seed<sub>13</sub>_ to generate _R<sub>13</sub>_ and _π<sub>13</sub>_.
 + _S<sub>2</sub>_ computes
-  ![B:=\pi_{23}(\pi_{12}(A_2)\oplus R_{12})\oplus R_{23}](http://www.sciweavers.org/tex2img.php?eq=%24B%3A%3D%5Cpi_%7B23%7D%28%5Cpi_%7B12%7D%28A_2%29%5Coplus%20R_%7B12%7D%29%5Coplus%20R_%7B23%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), and sends _B_ to _S<sub>1</sub>_.
-+ _S<sub>1</sub>_ computes ![C:=\pi_{12}(A_1)\oplus R_{12}](http://www.sciweavers.org/tex2img.php?eq=C%3A%3D%5Cpi_%7B12%7D%28A_1%29%5Coplus%20R_%7B12%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and
+  ![B:=\pi_{23}(\pi_{12}(A_2)\oplus R_{12})\oplus R_{23}](bucketization-equation-images/S_2_computes.svg), and sends _B_ to _S<sub>1</sub>_.
++ _S<sub>1</sub>_ computes ![C:=\pi_{12}(A_1)\oplus R_{12}](bucketization-equation-images/S_1_computes.svg) and
   sends _C_ to _S<sub>3</sub>_.
 
 #### Output
-+ _S<sub>1</sub>_  outputs ![A_1':=\pi_{13}(B)\oplus R_{13}](http://www.sciweavers.org/tex2img.php?eq=A_1%27%3A%3D%5Cpi_%7B13%7D%28B%29%5Coplus%20R_%7B13%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
-+ _S<sub>3</sub>_ outputs ![A_2':=\pi_{13}(\pi_{23}(C)\oplus R_{23})\oplus R_{13}](http://www.sciweavers.org/tex2img.php?eq=A_2%27%3A%3D%5Cpi_%7B13%7D%28%5Cpi_%7B23%7D%28C%29%5Coplus%20R_%7B23%7D%29%5Coplus%20R_%7B13%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0).
++ _S<sub>1</sub>_  outputs ![A_1':=\pi_{13}(B)\oplus R_{13}](bucketization-equation-images/S_1_output.svg).
++ _S<sub>3</sub>_ outputs ![A_2':=\pi_{13}(\pi_{23}(C)\oplus R_{23})\oplus R_{13}](bucketization-equation-images/S_3_output.svg).
 
 #### Re-share
-Optionally, _S<sub>3</sub>_ generates two secret shares of ![A_2'](http://www.sciweavers.org/tex2img.php?eq=A_2%27&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0) and sends the shares to
+Optionally, _S<sub>3</sub>_ generates two secret shares of ![A_2'](bucketization-equation-images/A_2'.svg) and sends the shares to
 _S<sub>1</sub>_ and _S<sub>2</sub>_ respectively, and _S<sub>1</sub>_ combines the share he receives with
-![A_1'](http://www.sciweavers.org/tex2img.php?eq=A_1%27&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0), so that now _S<sub>1</sub>_ and _S<sub>2</sub>_ have shares of the shuffled array.  This
+![A_1'](bucketization-equation-images/A_1'.svg), so that now _S<sub>1</sub>_ and _S<sub>2</sub>_ have shares of the shuffled array.  This
 puts the servers in place to run the protocol again, if e.g. they need to
 subdivide one of the buckets. Alternatively they could skip this resharing step
 and run the protocol switching the roles of _S<sub>2</sub>_ and _S<sub>3</sub>_.
