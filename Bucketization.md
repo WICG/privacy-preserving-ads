@@ -5,6 +5,8 @@ protocol which allows multiple parties to jointly generate a differentially
 private multi-dimensional histogram from data records collected from distributed
 data resources, without learning anything about individual records.
 
+A formal analysis of this proposal and early experimental results are available at https://eprint.iacr.org/2021/1490.pdf.
+
 - [Secure Multi-Party Aggregation](#secure-multi-party-aggregation)
     - [Performance Preview](#performance-preview)
   - [Overview](#overview)
