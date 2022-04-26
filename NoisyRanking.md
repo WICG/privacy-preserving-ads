@@ -18,20 +18,19 @@ This proposal, _PARAKEET with Noisy Ranking_, supersedes the original [PARAKEET]
   - [Embeddings](#embeddings)
 - [Noisy Ranking](#noisy-ranking)
 - [API Shape](#api-shape)
-- [Flow Diagram](#flow-diagram)
-  - [Global Setup](#global-setup)
-    - [Models](#models)
-    - [Feature Representation](#feature-representation)
-  - [Signals Collected Pre-Auction](#signals-collected-pre-auction)
-    - [Advertiser Data and Feature Representations](#advertiser-data-and-feature-representations)
-    - [Publisher Data and OpenRTB Requests](#publisher-data-and-openrtb-requests)
-    - [Publisher Data and OpenRTB Response](#publisher-data-and-openrtb-response)
-  - [Auction](#auction)
-    - [Browser to Trusted Mediator](#browser-to-trusted-mediator)
-    - [Trusted Mediator to Buyers](#trusted-mediator-to-buyers)
-    - [Trusted Mediator Evaluates Buyer Auction Logic and Retargeting](#trusted-mediator-evaluates-buyer-auction-logic-and-retargeting)
-    - [Browser insertion into Auction environment](#browser-insertion-into-auction-environment)
-  - [Event Reporting](#event-reporting)
+- [Global Setup](#global-setup)
+  - [Models](#models)
+  - [Feature Representation](#feature-representation)
+- [Signals Collected Pre-Auction](#signals-collected-pre-auction)
+  - [Advertiser Data and Feature Representations](#advertiser-data-and-feature-representations)
+- [Auction](#auction)
+  - [Publisher Data and OpenRTB Requests](#publisher-data-and-openrtb-requests)
+  - [Publisher Data and OpenRTB Response](#publisher-data-and-openrtb-response)
+  - [Browser to Trusted Mediator](#browser-to-trusted-mediator)
+  - [Trusted Mediator to Buyers](#trusted-mediator-to-buyers)
+  - [Trusted Mediator Evaluates Buyer Auction Logic and Retargeting](#trusted-mediator-evaluates-buyer-auction-logic-and-retargeting)
+  - [Browser insertion into Auction environment](#browser-insertion-into-auction-environment)
+- [Event Reporting](#event-reporting)
 - [Example Model Representation](#example-model-representation)
 - [Privacy Considerations](#privacy-considerations)
   - [Differential Privacy, Batching, and Caching](#differential-privacy-batching-and-caching)
@@ -103,7 +102,7 @@ The Trusted Mediator holds both &#928;<sub>p</sub> and &#928;<sub>a</sub>, train
 
 After choosing the winning ads, the Trusted Mediator returns the winners from each buyer to the browser, after which the auction runs as usual.
 
-We now present a more detailed flow diagram, and present some further API details.
+We now present some further API details.
 
 # API Shape
 The proposed API shape extends the **navigator.joinAdInterestGroup(group, duration)** and **navigator.runAdAuction(auctionConfig)** proposed in FLEDGE [joining interest groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#11-joining-interest-groups) and [initiating an on-device auction](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#21-initiating-an-on-device-auction).
@@ -129,55 +128,6 @@ TrustedRepresentation:
 - `modelTag`: string -> Model to use
 - `vectors`: object -> Key value pairs of embedding vector data to use.
 
-# Flow Diagram
-```mermaid
-sequenceDiagram
-  participant Advertiser
-  participant Publisher
-  participant Browser
-  participant SSP
-  participant Trusted Mediator
-  participant DSP
-  participant Trusted CDN
-  rect rgb(250, 250, 250)
-  Note left of Advertiser: Advertiser event
-  Advertiser->>Browser: From DSP's iframe: navigator.joinAdInterestGroup(myGroup)
-  Browser->>DSP: Request shared storage representation worklet
-  DSP->>Browser: Response with shared storage representation worklet
-  Browser->>Browser: Update buyer's shared storage to encode new features and metadata
-  end
-  rect rgb(250, 250, 250)
-  Note left of Advertiser: Ad request
-  Browser->>SSP: OpenRTBRequest(publisherSignals)
-  SSP->>DSP: OpenRTBRequest(publisherSignals)
-  DSP->>SSP: OpenRTBResponse(buyerData)
-  SSP->>Browser: OpenRTBResponse(buyerData)
-  Publisher->>Browser: navigator.requestAds(Context)
-  Browser->>Trusted Mediator: PublisherContext, DSPs[], SharedStoragePerDSP[]
-  Trusted Mediator->>DSP: For every DSP: Batch requests (browserEmbeddings)[]
-  DSP->>DSP: Select ads for browserEmbeddings
-  DSP->>Trusted Mediator: Relevant Ads (buyerAdEmbedding)[]
-  Trusted Mediator->>DSP: Request noisy ranking worklet
-  DSP->>Trusted Mediator: Respond noisy ranking worklet
-  Trusted Mediator->>Trusted Mediator: Per DSP, evaluate ads and rank 
-  Trusted Mediator->>Browser: Return top ads per DSP as trustedBiddingSignals
-  Browser->>Browser: DSP+SSP defined biz/auction/ranking (FLEDGE)
-  Browser->>Trusted CDN: Request creative from winning render URL
-  Trusted CDN->>Browser: Ad HTML
-  end
-  rect rgb(250, 250, 250)
-  Note left of Advertiser: Events Occur
-  Browser->>Browser: User views ad
-  Browser->>Trusted Mediator: ReportEvent(view)
-  Browser->>Browser: User clicks ad
-  Browser->>Trusted Mediator: ReportEvent(click)
-  end
-  rect rgb(250, 250, 250)
-  Note left of Advertiser: Reporting and Training
-  Trusted Mediator->>Trusted Mediator: SecureTraining(reports)
-  Trusted Mediator->>DSP: buyerAdEmbeddingModel
-  end
-```
 
 ## Global Setup
 Some initial investment is required from various parties for them to integrate with PARAKEET.
@@ -201,10 +151,20 @@ The mediator will translate these string representations into an ONNX sparse or 
 ## Signals Collected Pre-Auction
 Within PARAKEET with Nosiy Ranking, the vectors sent to the trusted mediator can contain information gathered in one of two ways:
 * Cross-site advertiser data is stored on the browser utilizing the [Shared Storage API](https://github.com/pythagoraskitty/shared-storage).  This representation is controlled per buyer, and is set via a worklet called by a buyer's iframe that's loaded on each advertiser's site.
-* Raw publisher data is converted to the corresponding feature vectors immediately before the auction, in an extension to an existing FLEDGE OpenRTB representation.
-
+* Raw publisher data is converted to the corresponding feature vectors [immediately before the auction](#publisher-data-and-openrtb-requests).
 
 ### Advertiser Data and Feature Representations
+```mermaid
+sequenceDiagram
+  participant Advertiser
+  participant Publisher
+  participant Browser
+  participant DSP
+  Advertiser->>Browser: From DSP's iframe: navigator.joinAdInterestGroup(myGroup)
+  Browser->>DSP: Request shared storage representation worklet
+  DSP->>Browser: Response with shared storage representation worklet
+  Browser->>Browser: Update buyer's shared storage to encode new features and metadata
+```
 Cross-advertiser data and feature representations are controlled via a worklet provided by the buyer within the existing interest group API within the FLEDGE framework.  We extend the FLEDGE specification in the following way:
 
 ```javascript
@@ -217,7 +177,7 @@ const myGroup = {
 }
 ```
 
-Within FLEDGE, this object is passed when the site owner (advertiser) calls `joinAdInterestGroup` to [assign a user's interest groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#11-joining-interest-groups).  As part of this call, if the `enableSharedStorageWorklet` is enabled, the user agent will pull a worklet defined by the DSP: `www.example-dsp.example/.well-known/shared-storage-worklet`.  This worklet will expose an update function that the browser calls:
+Within FLEDGE, this object is passed when the site owner (advertiser), or ad-tech operating on their behalf, calls `joinAdInterestGroup` to [assign a user's interest groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#11-joining-interest-groups).  As part of this call, if the `enableSharedStorageWorklet` is enabled, the user agent will pull a worklet defined by the DSP: `www.example-dsp.example/.well-known/shared-storage-worklet`.  This worklet will expose an update function that the browser calls:
 
 ```javascript
 class UpdateFeatureRepresentationsOperation {
@@ -236,6 +196,39 @@ class UpdateFeatureRepresentationsOperation {
 ```
 
 The use of the shared storage API is intended to be flexible, allowing for a variety of representations for the buyer to use.  We note that all changes to the state in the shared storage API are done at the instruction of the **buyer** using signals provided in conjunction with the advertiser, but no advertiser can directly modify these feature values.
+
+## Auction
+```mermaid
+sequenceDiagram
+  participant Publisher
+  participant Browser
+  participant SSP
+  participant Trusted Mediator
+  participant DSP
+  
+  rect rgb(250, 250, 250)
+  Note left of Publisher: Contextual Auction
+  Publisher->>SSP: RTBRequest(publisherSignals)
+  SSP->>DSP: RTBRequest(publisherSignals)
+  DSP->>SSP: RTBResponse(buyerData)
+  SSP->>Publisher: RTBResponse(buyerData)
+  end
+  
+  rect rgb(250, 250, 250)
+  Note left of Publisher: Parakeet Auction
+  Publisher->>Browser: navigator.runAdAuction(AuctionConfiguration)
+  Browser->>Trusted Mediator: PublisherContext, DSPs[], SharedStoragePerDSP[]
+  Trusted Mediator->>DSP: For every DSP: Batch requests (browserEmbeddings)[]
+  DSP->>DSP: Select candidate ads
+  DSP->>Trusted Mediator: Relevant Ads (buyerAdEmbedding)[]
+  Trusted Mediator->>DSP: Request noisy ranking worklet
+  DSP->>Trusted Mediator: Respond noisy ranking worklet
+  Trusted Mediator->>Trusted Mediator: Per DSP, evaluate ads and rank 
+  Trusted Mediator->>Browser: Return top ads per DSP as trustedBiddingSignals
+  Browser->>Browser: DSP+SSP defined biz/auction/ranking  
+  Browser->>Publisher: Opaque URL for winning creative
+  end
+```
 
 ### Publisher Data and OpenRTB Requests
 Prior to calling any auction, contextual signals are requested from each buyer as part of the TURTLEDOVE [contextual request](https://github.com/WICG/turtledove/blob/main/Original-TURTLEDOVE.md#two-uncorrelated-requests, https://github.com/google/ads-privacy/tree/master/proposals/fledge-rtb) using OpenRTB.  In addition to the other signals, we require the following additional `tm` setting per browser vendor:
@@ -278,8 +271,6 @@ Buyer Data:
 
 The "modeltag" field is populated by the buyer with knowledge of the trusted mediator that the data will be passed to. The vectors are features derived from the publisher known information sent in the OpenRTB Request phase.
 Additionally, a buyer can specify DSP-level sharedStorageTags that should be sent across to the trusted mediator as a list.  Unlike previous implementations, the browser will handle the lookup of the sharedStorageTags and insert these tags' values into the "vectors" object.
-
-## Auction
 
 ### Browser to Trusted Mediator
 After the OpenRTB calls have completed, a FLEDGE [auction initiates](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#21-initiating-an-on-device-auction) with a call to `navigator.runAuctionConfig(myAuctionConfig)` passing an object like so:
@@ -427,6 +418,22 @@ where the `ads` field is populated with the output from the `finalizeAds` above,
 
 
 ## Event Reporting
+
+```mermaid
+sequenceDiagram
+  rect rgb(250, 250, 250)
+  Note left of Browser: Events Occur
+  Browser->>Browser: User views ad
+  Browser->>Trusted Mediator: ReportEvent(view)
+  Browser->>Browser: User clicks ad
+  Browser->>Trusted Mediator: ReportEvent(click)
+  end
+  rect rgb(250, 250, 250)
+  Note left of Browser: Reporting and Training
+  Trusted Mediator->>Trusted Mediator: SecureTraining(reports)
+  Trusted Mediator->>DSP: buyerAdEmbeddingModel
+  end
+```
 The browser, in addition to other reporting, will return the [events](https://github.com/WICG/turtledove/blob/main/Fenced_Frames_Ads_Reporting.md#example) that occur with the ad back to the Trusted Mediator for future training.  Such events, like winning the auction, viewing, or clicking, will be merged back with the stored record of the true publisher signals needed to retrain the model.  These will then be available to construct sample and label representations for the buyer: the sample/label will never be sent back to the buyer in full fidelity. Rather, the buyer can specify how to construct a label or specify subsets of traffic a model should be retrained on, e.g.,
 
 ```
