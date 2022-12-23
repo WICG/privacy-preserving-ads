@@ -97,8 +97,8 @@ The Trusted Mediator holds both &#928;<sub>p</sub> and &#928;<sub>a</sub>, train
 1. Perform the mapping &#928;<sub>p</sub>(*User History Signals*, *Publisher Context*) &rightarrow; C (or `browserEmbedding`) since only the Trusted Mediator is privy to these signals.
 2. Add noise to C to obtain: C + &theta; -> C<sup>'</sup>.  Here &theta; is a random vector of noise intended to anonymize fine grained user signals.
 3. Pass the noisy representation C<sup>'</sup> to the corresponding buyer.
-4. Collect all ads' `buyerAdEmbedding` A<sup>t</sup> from the buyer.
-5. Evaluate the true ranking function C &sdot; S<sub>t</sub> (not using the noisy C), and choose the winner. 
+4. Collect all ads' `buyerAdEmbedding` S<sub>t</sub> from the buyer.
+5. Evaluate the true ranking function C &sdot; S<sub>t</sub> (not using the noisy C<sup>'</sup>), and choose the winner. 
 
 After choosing the winning ads, the Trusted Mediator returns the winners from each buyer to the browser, after which the auction runs as usual.
 
