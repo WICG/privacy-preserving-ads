@@ -17,7 +17,7 @@ See the [_Ad Selection Overview_ document](Ad+Selection+Overview.md) for more de
 This table documents known differences at the time of publication. As this proposal and others evolve, we expect to update it accordingly.
 
 |  |Protected Audience API | Ad Selection API |
-|  |  |  |
+| - | - | - |
 | Auction location | TEE or on-device | TEE Only |
 | Interest Groups | Partitioned by domain everywher | Partitioned by domain on disk and in transit, merged in trusted/transient/opaque env. |
 | Privacy constraint approaches | DP, k-anonymity, single domain context | DP, K |
