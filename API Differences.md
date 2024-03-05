@@ -19,7 +19,7 @@ This table documents known differences at the time of publication. As this propo
 |  |Protected Audience API | Ad Selection API |
 | - | - | - |
 | Auction location | TEE or on-device | TEE Only |
-| Interest Groups | Partitioned by domain everywher | Partitioned by domain on disk and in transit, merged in trusted/transient/opaque env. |
+| Interest Groups | Partitioned by domain everywhere | Partitioned by domain on disk and in transit, merged in trusted/transient/opaque env. |
 | Privacy constraint approaches | DP, k-anonymity, single domain context | DP, K |
 | Multi-slot auctions - (Competitive Exclusion, Page Caps, Roadblocking) | Not fully supported due to scoreAd limitations.| Allows for coordinated placements via multi-tag support in scoreAds(), allows for competitive exclusion, page caps, roadblocking. |
 | Multi-size | Not fully supported due to `requestedSize` limitations. | Supported with `requestedSizes`and k-anon requirement for `renderURL` X `size`. |
