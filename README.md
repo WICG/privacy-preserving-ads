@@ -7,26 +7,26 @@ The documents in this repository are meant to help describe the Ad Selection API
 We plan to hold regular meetings under the auspices of the WICG to go through the details of this proposal and quickly respond to feedback. Please comment on the timing question in [Issue #50](https://github.com/WICG/privacy-preserving-ads/issues/50) if you want to participate in these meetings to influence the direction of the proposal.
 
 If you are ready to dive in, we recommend you start with the following content:
-- The [**Ad Selection API overview**](Ad+Selection+Overview.md), which describes the proposal at a high-level including descriptions of privacy model, infrastructure, and features.
-- The [**Auction & infrastructure design**](Auction+&+Infrastructure+Design.md), which contains diagrams of the auction and ad serving flows and how they are similar and different to other proposals in this space.
+- The [**Ad Selection API overview**](Ad%20Selection%20Overview.md), which describes the proposal at a high-level including descriptions of privacy model, infrastructure, and features.
+- The [**Auction & infrastructure design**](Auction%20&%20Infrastructure%20Design.md), which contains diagrams of the auction and ad serving flows and how they are similar and different to other proposals in this space.
 
 Since this API leverages similar concepts from other proposals, some of the concepts referenced are already well-described in those proposals' GitHub repositories. We aim to minimize duplicative explanations and definitions in favor of focusing on documenting key additions and differences.
 
 ## Documents in this repository:
 1. Proposal overview
 
-     1.2. [**Ad Selection API overview**](Ad+Selection+Overview.md): an overview of the Ad Selection API, including the rationale for a new proposal
+     1.2. [**Ad Selection API overview**](Ad%20Selection%20Overview.md): an overview of the Ad Selection API, including the rationale for a new proposal
 
-     1.1. [**API differences**](API+Differences.md): a high-level overview of differences between Ad Selection API and other industry proposals.
+     1.1. [**API differences**](API%20Differences.md): a high-level overview of differences between Ad Selection API and other industry proposals.
 
 
 2. Data flows & examples
 
-     2.1. [**Auction & infrastructure design**](Auction+&+Infrastructure+Design.md)
+     2.1. [**Auction & infrastructure design**](Auction%20&%20Infrastructure%20Design.md)
 
-     2.2. [**Life of an ad request**](Life+of+an+Ad+Request.md)
+     2.2. [**Life of an ad request**](Life%20of%20an%20Ad%20Request.md)
 
-3. [**API specification**](API+Details.md)
+3. [**API specification**](API%20Details.md)
 
 ## Background reading: the [Protected Audience API](https://github.com/WICG/turtledove/blob/main/FLEDGE.md)
 Since this proposal leverages many of the concepts and terms used in the the Protected Audience API proposal, we recommend you review the following resources as a part of reviewing this proposal:
