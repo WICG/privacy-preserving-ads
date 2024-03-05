@@ -55,7 +55,7 @@ const auctionBlob = await navigator.getInterestGroupAdAuctionData({
 fetch('https://www.example-ssp.site/auction', {
   method: "POST",
   body: auctionBlob,
-
+  ...
 })
 ```
 <span style="display:block;text-align:center">![Life of an Ad Request Step 0](images/life_of_an_ad_combined_step1.png)</span>
@@ -85,8 +85,8 @@ const myAuctionConfig = {
     'auctionSignals': {'size': '300x250', 'url': 'sports.site', },
     'requestedSize': [{'width': 300, 'height': 250}],
     'perBuyerSignals': {".../dsp-one.site" => {"signals from dsp-one"}},
-    'perBuyerTimeouts': {},
-    'perBuyerGroupLimits': {},
+    'perBuyerTimeouts': {...},
+    'perBuyerGroupLimits': {...},
 
 }
 const result = await navigator.runAdAuction(myAuctionConfig);
@@ -165,7 +165,7 @@ In the case when the contextual auction wins, you can render and report as you d
 The seller front end sends the encrypted winning bid back to the seller ad service. The winner is encrypted to prevent the seller ad service from being able to observe anything about the winning bid. The seller ad service then returns the encrypted winner back to the browser:
 
 ```javascript
-fetch('https://www.example-ssp.site/auction', { adAuctionHeaders: true, })
+fetch('https://www.example-ssp.site/auction', { adAuctionHeaders: true,  ...})
 const auctionResultPromise = navigator.runAdAuction({
   'seller': 'https://www.example-ssp.site',
   'serverResponse': response_blob,

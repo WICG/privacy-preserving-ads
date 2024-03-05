@@ -36,7 +36,7 @@ While the IG has a defined top-level structure that interacts with the private a
 
 The consumer is able to see the IGs they have joined and remove themselves if they don't wish to be targeted in that way anymore.
 
-You can see more detail on IG structure and usage in Step 0 of [Life of an Ad Request](life of an ad request.md), or in our [API Spec](api details.md).
+You can see more detail on IG structure and usage in Step 0 of [Life of an Ad Request](Life%20of%20an%20Ad%20Request.md), or in our [API Spec](API%20Details.md).
 
 
 ## Private auction
@@ -53,7 +53,7 @@ Once initiated the PA:
 
 The PA itself results in 0 or 1 creatives per auction that are available to render. Tools are provided for the publisher to make a choice between the PA result and the result of any non-Ad Selection API-based auction run through existing channels.
 
-You can see much greater detail on the Auction Flow in [life of an ad request](Life%20of%20an%20Ad%20request.md).
+You can see much greater detail on the Auction Flow in [life of an ad request](Life%20of%20an%20Ad%20Request.md).
 
 While the interest groups and the private auction define structure and process, they are designed to allow ad techs to map their own domain models, objects, and flows onto it. The intention is to allow buying and selling to happen based on existing signals.
 

@@ -47,11 +47,11 @@ const joinPromise = navigator.joinAdInterestGroup(myGroup, 30 * kSecsPerDay);
 
 The API allows data that would traditionally be collected and stored server side and referenced/looked up via the use of third-party cookies to instead be stored locally within  the user's browser profile. This shifts the data into the control of the user where they can more easily and confidently see what data is collected and used, provides control to delete or opt out, and allows the browser to protect the user by enforcing constraints on the data uniqueness (to prevent microtargeting or hidden PII) as well as determining how and when the data can be safely used.
 
-Additionally, there is a complementary `navigator.leaveAdInterestGroup(myGroup)` API and embedded browser controls to manage this data. See additional information at [Protected Audiences  Browsers Record Interest Groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#1-browsers-record-interest-groups).
+Additionally, there is a complementary `navigator.leaveAdInterestGroup(myGroup)` API and embedded browser controls to manage this data. See additional information at [Protected Audiences - Browsers Record Interest Groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#1-browsers-record-interest-groups).
 
 ### 2.0 Ad auction/selection
 #### 2.1 Starting a server auction
-In order to start selecting an ad via an ad auction, a request must be made in a similar manner as described in [Protected Audiences  Bidding & Auction API](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md).
+In order to start selecting an ad via an ad auction, a request must be made in a similar manner as described in [Protected Audiences - Bidding & Auction API](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md).
 
 ##### Get the encrypted auction request
 The `navigator.getInterestGroupAdAuctionData(AdAuctionDataConfig)`API will allow the requestor to receive an **encrypted auction request** blob that cannot be directly observed by the website, ad-tech, or other third party. If a user has opted out or deleted interest groups this API will still return a blob that will simply contain no Interest Groups; this will not be directly observable or possible to identify or target users due to this choice.
@@ -88,7 +88,7 @@ The semantics of how sellers structure their auction request are largely up to t
 Details of what happens during the secure and private server-side auction can be found in more details in a [life of an ad request](Life%20of%20an%20Ad%20Request.md) and related documents. At a high level, the primary additions that can be expected with the Ad Selection API and auction are that DSPs (buyers) can dynamically inject additional creatives and bids at auction time; support for traditional ad server features through multi-tag auctions and multi-size tags; and validation and enforcement of k-anonymity thresholds has been incorporated into the server auction flow. We believe the proximity to the auction logic for k-anon checks allows for quicker response, reducing auction latency, and improves the accuracy of this protection without requiring individual clients to make a choice between accuracy and performance.
 
 #### 2.3 Handling the server response
-Once an encrypted auction response is received by the browser it will validate the contents and ensure that any proposed winning creatives are indeed sufficiently anonymous. In order to consistently apply these privacy checks the response can be passed as the `serverResponse` property to `navigator.runAdAuction()` similarly to [Protected Audiences  Complete auction in browser](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md#step-4-complete-auction-in-browser).
+Once an encrypted auction response is received by the browser it will validate the contents and ensure that any proposed winning creatives are indeed sufficiently anonymous. In order to consistently apply these privacy checks the response can be passed as the `serverResponse` property to `navigator.runAdAuction()` similarly to [Protected Audiences - Complete auction in browser](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md#step-4-complete-auction-in-browser).
 
 ```javascript
 const auctionResultPromise = navigator.runAdAuction({
