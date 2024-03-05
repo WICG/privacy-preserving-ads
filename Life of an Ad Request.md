@@ -1,5 +1,5 @@
 # Life of an ad request
-This document describes the life of an ad auction using the Ad Selection API. The Ad Selection API auction uses a similar API surface area as a Protected Audience API auction to ensure ease of development while providing more flexibility around data usage in trusted environments, creative selection, and modeling. 
+This document describes the life of an ad auction using the Ad Selection API. The Ad Selection API auction uses a similar API surface area as a Protected Audience API auction to ensure ease of development while providing more flexibility around data usage in trusted environments, creative selection, and modeling.
 
 We'll begin with a simple auction consisting of a single supply-side platform (SSP) and single demand-side platform (DSP) with two advertisers. This will help to isolate and illustrate the concepts, before we turn up the resolution to multiple DSPs, and even multiple SSPs in the next document.
 
@@ -22,7 +22,7 @@ const myGroup = {
  const joinPromise = navigator.joinAdInterestGroup(myGroup, TTLInSeconds);
 ```
 
-(See [API details](API+Details.md) for a formal specification of the IG structure and joinAdInterestGroup signature. Note "..." in URLs is meant to reduce text; the entire URL is required).
+(See [API details](API%20Details.md) for a formal specification of the IG structure and joinAdInterestGroup signature. Note "..." in URLs is meant to reduce text; the entire URL is required).
 
 ### Update
 The interest group can be updated in two ways:
@@ -30,7 +30,7 @@ The interest group can be updated in two ways:
 - The `updateUrl` will be called, by default once a day, and the returned results can overwrite most elements of the IG. Note that the TTL is not extended this case.
 
 ### Usage
-Once the athletes IG has been successfully joined, the IG will live in the browser for the specified TTL. It will be able to participate in any Private Auction to which the publisher has invited its owner. The publisher can include either all owner's IGs available on the browser, or list DSP domains which will match on the `owner` field of the IGs. 
+Once the athletes IG has been successfully joined, the IG will live in the browser for the specified TTL. It will be able to participate in any Private Auction to which the publisher has invited its owner. The publisher can include either all owner's IGs available on the browser, or list DSP domains which will match on the `owner` field of the IGs.
 
 To participate in an auction, the `biddingLogicUrl` must contain a function named `generateBid`. The Auction Framework will invoke that function and pass the entire IG, including `userBiddingSignals`, as well as the result of a call to `trustedBiddingSignalsUrl`. The `generateBid` function can return 0 or more bids for consideration by the SSPs ranking function. See Step 4 for more details.
 
@@ -55,7 +55,7 @@ const auctionBlob = await navigator.getInterestGroupAdAuctionData({
 fetch('https://www.example-ssp.site/auction', {
   method: "POST",
   body: auctionBlob,
-  …
+
 })
 ```
 <span style="display:block;text-align:center">![Life of an Ad Request Step 0](images/life_of_an_ad_combined_step1.png)</span>
@@ -70,7 +70,7 @@ Once the seller ad service has received the request, it will typically run its e
 
 After the contextual auction finishes, the SSP initiates the private auction on its TEEs, passing in the opaque IG blob and an auction configuration that includes: the DSPs it wishes to include in the Private Auction; a URL containing a bid ranking function; `auctionSignals` that the DSPs need to understand the tags they are bidding on; and some operational signals that allow for control over the timing and resource usage of the auction.
 
-The seller has two types of TEEs. 
+The seller has two types of TEEs.
 - The seller front end (SFE) handles sending IGs to the appropriate buyers, fetching real time signals for and invoking scoreAd in the Auction Service TEE, and finally returning 0 or 1 bids per auction to the Seller Ad Service.
 - The auction service TEE handles ranking the opaque bids returned by the buyers, sorting and returning the winner, and generating the reporting URLs to send to the seller and winning buyer on render.
 
@@ -82,12 +82,12 @@ const myAuctionConfig = {
     'interestGroupBuyers': ['...dsp-one.site', 'dsp-two.site', ...],
     'decisionLogicUrl': '.../bid-ranking-function.js',
     'trustedScoringSignalsUrl': '.../creative-audit-scores',
-    'auctionSignals': {'size': '300x250', 'url': 'sports.site', …},
+    'auctionSignals': {'size': '300x250', 'url': 'sports.site', },
     'requestedSize': [{'width': 300, 'height': 250}],
     'perBuyerSignals': {".../dsp-one.site" => {"signals from dsp-one"}},
-    'perBuyerTimeouts': {…},
-    'perBuyerGroupLimits': {…},
-    …
+    'perBuyerTimeouts': {},
+    'perBuyerGroupLimits': {},
+
 }
 const result = await navigator.runAdAuction(myAuctionConfig);
 ```
@@ -104,7 +104,7 @@ The seller front end will send one request to the TEEs of each DSP included in t
 - Bidding Service: handles the execution of the bidding process and returning 0 or more bids to the buyer front end (BFE).
 
 ## Flow
-1. The BFE receives the request and merges the owners IGs as indicated. It does this by invoking the `mergeFunction` defined in the IGs `biddingFunctionUrl` (or the default merge function if none is defined), passing in any IG for that owner with the same `biddingFunctionUrl`. The `mergeFunction` can return 0 or more IGs: 
+1. The BFE receives the request and merges the owners IGs as indicated. It does this by invoking the `mergeFunction` defined in the IGs `biddingFunctionUrl` (or the default merge function if none is defined), passing in any IG for that owner with the same `biddingFunctionUrl`. The `mergeFunction` can return 0 or more IGs:
     - If no IGs are returned, each IG joined in the browser will participate in the auction on its own.
     - If 1 or more IGs are returned, only those IGs will participate in the auction.
 
@@ -135,8 +135,8 @@ generateBid(interestGroup, auctionSignals, perBuyerSignals, trustedBiddingSignal
           'bid': bidValue,
           'render': renderUrl,
           'adComponents': ["adComponentRenderUrlOne", "adComponentRenderUrlTwo"],
-          'allowComponentAuction': false}…];
- 
+          'allowComponentAuction': false}];
+
 }
 ```
 
@@ -165,7 +165,7 @@ In the case when the contextual auction wins, you can render and report as you d
 The seller front end sends the encrypted winning bid back to the seller ad service. The winner is encrypted to prevent the seller ad service from being able to observe anything about the winning bid. The seller ad service then returns the encrypted winner back to the browser:
 
 ```javascript
-fetch('https://www.example-ssp.site/auction', { adAuctionHeaders: true, … })
+fetch('https://www.example-ssp.site/auction', { adAuctionHeaders: true, })
 const auctionResultPromise = navigator.runAdAuction({
   'seller': 'https://www.example-ssp.site',
   'serverResponse': response_blob,
@@ -185,7 +185,7 @@ Both the `reportWin` and `reportResult` function will have constrained data acce
 - Each can send a single POST request back to their home servers.
 
 ```javascript
-reportWin(auctionSignals, perBuyerSignals, sellerSignals, 
+reportWin(auctionSignals, perBuyerSignals, sellerSignals,
  buyerReportingMetadata) {
   ...
 }
@@ -205,21 +205,21 @@ However, in order to significantly reduce payload size of the response, the Bidd
 
 
 ## Pricing
-The `reportResult` function has access to additional data useful in determining the final pricing of the win. 
+The `reportResult` function has access to additional data useful in determining the final pricing of the win.
 
 
 
 
 
 # Step 6: User Interactions
-Once the creative is rendered inside of the fenced frame, JavaScript can still be used to trigger events for things like clicks, views, or video events. However, key auction information from `auctionConfig` and the winning bid is no longer available to allow for linking those events, and any financial implications, to the original auction. 
+Once the creative is rendered inside of the fenced frame, JavaScript can still be used to trigger events for things like clicks, views, or video events. However, key auction information from `auctionConfig` and the winning bid is no longer available to allow for linking those events, and any financial implications, to the original auction.
 
 This is solved via [Fenced Frame Reporting](https://github.com/WICG/turtledove/blob/main/Fenced_Frames_Ads_Reporting.md).  Inside of reportResult and reportWin, the SSP and DSP have the ability to register callbacks that can be triggered inside the fenced frame (or iframe; the API works there as well). Since reportResult and reportWin have access to the `auctionConfig`, `auctionSignals`, etc, the callback can include a POST request with important auction time information that is not available inside the FF, but still keeps that information hidden from the fenced frame.
 
 # Single DSP summary
 
 We've walked through the steps in detail here, but to summarize:
-1. Interest groups are joined on locally on the browser as the user visits sites the DSP represents. 
+1. Interest groups are joined on locally on the browser as the user visits sites the DSP represents.
 1. An auction is sent to the seller ad server with the usual information plus the encrypted IGs.
 1. The seller ad service runs its contextual bid requests and auction.
 1. The seller ad service forms the `auctionConfig`, including any `perBuyerSignals` returned by the bidders in step (3), and sends that along with the encrypted IGs to its seller front end (SFE) service TEE.

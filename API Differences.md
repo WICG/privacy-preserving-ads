@@ -12,7 +12,7 @@ Ad Selection API is currently largely syntactically and feature compatible with 
 To prevent the API from enabling persistent cross-site profile building of users, cross-domain signals must not be joinable in untrusted or persistent environments. We will begin with a TEE-only solution to keep operational excellence and competitiveness with ad techs. Creatives can be dynamically selected.
 We look forward to extensive public engagement with the industry, PATCG, and other participants.
 
-See the [_Ad Selection Overview_ document](Ad+Selection+Overview.md) for more detail.
+See the [_Ad Selection Overview_ document](Ad%20Selection%20Overview.md) for more detail.
 
 This table documents known differences at the time of publication. As this proposal and others evolve, we expect to update it accordingly.
 

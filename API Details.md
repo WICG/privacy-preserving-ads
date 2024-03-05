@@ -1,9 +1,9 @@
 # Ad Selection API details
 
-This document describes the proposed API for the Ad Selection API proposal.The Ad Selection API aims to have a common API surface area with other similar proposals targeting the same use cases (i.e., the Protected Audience API) with the hope of requiring a lower cognitive load for comparing and contrasting proposals as well as to ease experimentation and adoption by web developers. You can see concepts and primitives referenced here described in the [ad selection overview](Ad+Selection+Overview.md).
+This document describes the proposed API for the Ad Selection API proposal.The Ad Selection API aims to have a common API surface area with other similar proposals targeting the same use cases (i.e., the Protected Audience API) with the hope of requiring a lower cognitive load for comparing and contrasting proposals as well as to ease experimentation and adoption by web developers. You can see concepts and primitives referenced here described in the [ad selection overview](Ad%20Selection%20Overview.md).
 
 ### API shape
-The Ad Selection API aims to maximize syntactic compatibility with the [Protected Audience API](https://github.com/WICG/turtledove/blob/main/FLEDGE.md) to help ease industry adoption of various proposals. Therefore,  where possible, the same primitives will be available. Examples include`navigator.joinAdInterestGroup(…)`, `navigator.leaveAdInterestGroup(…)`,  `navigator.getInterestGroupAdAuctionData(…)`, and `navigator.runAdAuction(…)`. However, they may function differently and/or provide additional functionality to protect users' privacy and/or increase utility. We strive to make any differences easy to understand and unlikely to create user-visible site compatibility issues.
+The Ad Selection API aims to maximize syntactic compatibility with the [Protected Audience API](https://github.com/WICG/turtledove/blob/main/FLEDGE.md) to help ease industry adoption of various proposals. Therefore,  where possible, the same primitives will be available. Examples include`navigator.joinAdInterestGroup()`, `navigator.leaveAdInterestGroup()`,  `navigator.getInterestGroupAdAuctionData()`, and `navigator.runAdAuction()`. However, they may function differently and/or provide additional functionality to protect users' privacy and/or increase utility. We strive to make any differences easy to understand and unlikely to create user-visible site compatibility issues.
 
 ### On-device vs. server auction
 Purely on-device auctions are a promising concept; however, we currently believe there are considerable downsides.
@@ -18,7 +18,7 @@ In summary, the Ad Selection API requires the usage of bidding and auction TEE i
 #### 1.1 Joining interest groups
 To enable the advertiser to choose the most relevant ad for a specific user and context, an advertiser, likely using the help of demand side platform (DSP) tools, will be able to add the user to an ad interest group or share semantic representations, and propagate these to the service using an API similar to that defined by the Protected Audience API:
 
-```javascript 
+```javascript
 const myGroup = {
   'owner': 'https://www.example-dsp.site',
   'name': 'womens-running-shoes',
@@ -47,11 +47,11 @@ const joinPromise = navigator.joinAdInterestGroup(myGroup, 30 * kSecsPerDay);
 
 The API allows data that would traditionally be collected and stored server side and referenced/looked up via the use of third-party cookies to instead be stored locally within  the user's browser profile. This shifts the data into the control of the user where they can more easily and confidently see what data is collected and used, provides control to delete or opt out, and allows the browser to protect the user by enforcing constraints on the data uniqueness (to prevent microtargeting or hidden PII) as well as determining how and when the data can be safely used.
 
-Additionally, there is a complementary `navigator.leaveAdInterestGroup(myGroup)` API and embedded browser controls to manage this data. See additional information at [Protected Audiences – Browsers Record Interest Groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#1-browsers-record-interest-groups).
+Additionally, there is a complementary `navigator.leaveAdInterestGroup(myGroup)` API and embedded browser controls to manage this data. See additional information at [Protected Audiences  Browsers Record Interest Groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#1-browsers-record-interest-groups).
 
 ### 2.0 Ad auction/selection
 #### 2.1 Starting a server auction
-In order to start selecting an ad via an ad auction, a request must be made in a similar manner as described in [Protected Audiences – Bidding & Auction API](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md).
+In order to start selecting an ad via an ad auction, a request must be made in a similar manner as described in [Protected Audiences  Bidding & Auction API](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md).
 
 ##### Get the encrypted auction request
 The `navigator.getInterestGroupAdAuctionData(AdAuctionDataConfig)`API will allow the requestor to receive an **encrypted auction request** blob that cannot be directly observed by the website, ad-tech, or other third party. If a user has opted out or deleted interest groups this API will still return a blob that will simply contain no Interest Groups; this will not be directly observable or possible to identify or target users due to this choice.
@@ -85,15 +85,15 @@ Sec-Auction-Platform-Support: "Microsoft Edge";min-version="1.0.0.1", "Not;A=Bra
 ##### Serverside auction time
 The semantics of how sellers structure their auction request are largely up to them. The only requirement is that the provided encryptedRequest payload be provided to the associated seller front end TEE service and that the resulting **encrypted auction response** be returned to browser with a corresponding `Ad-Auction-Result` response header for correct validation and identification.
 
-Details of what happens during the secure and private server-side auction can be found in more details in a [life of an ad request](Life+of+an+Ad+Request.md) and related documents. At a high level, the primary additions that can be expected with the Ad Selection API and auction are that DSPs (buyers) can dynamically inject additional creatives and bids at auction time; support for traditional ad server features through multi-tag auctions and multi-size tags; and validation and enforcement of k-anonymity thresholds has been incorporated into the server auction flow. We believe the proximity to the auction logic for k-anon checks allows for quicker response, reducing auction latency, and improves the accuracy of this protection without requiring individual clients to make a choice between accuracy and performance.
+Details of what happens during the secure and private server-side auction can be found in more details in a [life of an ad request](Life%20of%20an%20Ad%20Request.md) and related documents. At a high level, the primary additions that can be expected with the Ad Selection API and auction are that DSPs (buyers) can dynamically inject additional creatives and bids at auction time; support for traditional ad server features through multi-tag auctions and multi-size tags; and validation and enforcement of k-anonymity thresholds has been incorporated into the server auction flow. We believe the proximity to the auction logic for k-anon checks allows for quicker response, reducing auction latency, and improves the accuracy of this protection without requiring individual clients to make a choice between accuracy and performance.
 
 #### 2.3 Handling the server response
-Once an encrypted auction response is received by the browser it will validate the contents and ensure that any proposed winning creatives are indeed sufficiently anonymous. In order to consistently apply these privacy checks the response can be passed as the `serverResponse` property to `navigator.runAdAuction(…)` similarly to [Protected Audiences – Complete auction in browser](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md#step-4-complete-auction-in-browser).
+Once an encrypted auction response is received by the browser it will validate the contents and ensure that any proposed winning creatives are indeed sufficiently anonymous. In order to consistently apply these privacy checks the response can be passed as the `serverResponse` property to `navigator.runAdAuction()` similarly to [Protected Audiences  Complete auction in browser](https://github.com/WICG/turtledove/blob/main/FLEDGE_browser_bidding_and_auction_API.md#step-4-complete-auction-in-browser).
 
 ```javascript
 const auctionResultPromise = navigator.runAdAuction({
   'seller': 'https://seller.site,
-  'requestId': ‘someUniqueID',
+  'requestId': someUniqueID',
   'serverResponse': encryptedAuctionResponseBlob,
 }).then(winningUrn? => {
   if(winningUrn) {
@@ -112,7 +112,7 @@ The resulting opaque URL, if present, can then be used as the src property to a 
 Once the winning ad has rendered in its frame, the seller and the winning buyer each have an opportunity to perform logging and reporting on the auction outcome. The reporting URLs are generated in the [Auction service] (https://github.com/privacysandbox/fledge-docs/blob/main/bidding_auction_services_system_design.md#auction-service) using the `reportResult()` function provided by the seller and `reportWin()`  function provided by the buyer. Spec for `reportResult()` and `reportWin()`can be found [here](https://github.com/privacysandbox/fledge-docs/blob/main/bidding_auction_event_level_reporting.md#the-reportresult-specification). These reporting URLs are returned to the client as part of the encrypted auction response from the server. Once the winning Ad is rendered, these reporting URLs are pinged by the client.
 
 #### 3.2 Other ad events via fenced frame reporting API
-Ads often need to report on events that happen once the ad is rendered. An example would be reporting on whether an ad became viewable on-screen. Ad techs can register URLs that correspond to such events or beacons when `reportResult()` and `reportWin()` are run. The beacons can be registered by calling the `registerAdBeacon()` function, which will be a part of the executable code in Roma on the Auction Service. 
+Ads often need to report on events that happen once the ad is rendered. An example would be reporting on whether an ad became viewable on-screen. Ad techs can register URLs that correspond to such events or beacons when `reportResult()` and `reportWin()` are run. The beacons can be registered by calling the `registerAdBeacon()` function, which will be a part of the executable code in Roma on the Auction Service.
 For example:
 ```javascript
 reportWin(auctionSignals, perBuyerSignals, sellerSignals, buyerReportingMetadata) {
@@ -129,7 +129,7 @@ These registered ad beacon URLs are also returned as part of the encrypted aucti
 
 
 ##### registerAdBeacon
-The `reportResult` and `reportWin` code on the auction service will be able to register an event called `reserved.top_navigation` via `registerAdBeacon`. 
+The `reportResult` and `reportWin` code on the auction service will be able to register an event called `reserved.top_navigation` via `registerAdBeacon`.
 
 ```javascript
 registerAdBeacon({
@@ -143,5 +143,5 @@ The new event, if registered, implies that an automatic beacon will be sent by t
 The beacons that are generated from a `reportEvent` invocation or via the automatic `reserved.top_navigation` event will now be automatically eligible for attribution, i.e. the browser appends the `Attribution-Reporting-Eligible` HTTP request header. The beacon responses can then register attribution sources as usual, as described [here](https://github.com/WICG/attribution-reporting-api/blob/main/EVENT.md#registering-attribution-sources).
 
 More details regarding this flow can be found [here](https://github.com/WICG/turtledove/blob/main/Fenced_Frames_Ads_Reporting.md#support-for-attribution-reporting).
- 
+
 

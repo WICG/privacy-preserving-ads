@@ -23,7 +23,7 @@ Next, we'll dig into the primary design elements of the Ad Selection API Auction
 
 ## Interest groups
 
-Impressions are targeted, bid on, and won by Interest Groups (IGs). An IG is “joined” locally on the user's client by ad-tech code using APIs exposed by the client. Once joined, it may participate in any private auction initiated on that device. It has a time-to-live (TTL) of up to 30 days, which can be extended on further interactions.
+Impressions are targeted, bid on, and won by Interest Groups (IGs). An IG is "joined" locally on the user's client by ad-tech code using APIs exposed by the client. Once joined, it may participate in any private auction initiated on that device. It has a time-to-live (TTL) of up to 30 days, which can be extended on further interactions.
 
 The IG combines elements of current ad tech functionality related to bidding and targeting:
 - Targeting signals.
@@ -53,7 +53,7 @@ Once initiated the PA:
 
 The PA itself results in 0 or 1 creatives per auction that are available to render. Tools are provided for the publisher to make a choice between the PA result and the result of any non-Ad Selection API-based auction run through existing channels.
 
-You can see much greater detail on the Auction Flow in [life of an ad request](Life+of+an+Ad+request.md).
+You can see much greater detail on the Auction Flow in [life of an ad request](Life%20of%20an%20Ad%20request.md).
 
 While the interest groups and the private auction define structure and process, they are designed to allow ad techs to map their own domain models, objects, and flows onto it. The intention is to allow buying and selling to happen based on existing signals.
 
@@ -68,7 +68,7 @@ The constraints on those processes include:
 - K-anonymity
 - Entropy
 
-Many of these constraints are enforced via the use of Trusted Execution Environments (also known as “confidential computing”) which can provide guarantees around what code is running and protects against outside observations about what happens within the protected environment.
+Many of these constraints are enforced via the use of Trusted Execution Environments (also known as "confidential computing") which can provide guarantees around what code is running and protects against outside observations about what happens within the protected environment.
 
 Example applications of these constraints include:
 - Creative URLs may not be unique to any less than 50 browsers, ensuring that microtargeting cannot occur based on creative.
