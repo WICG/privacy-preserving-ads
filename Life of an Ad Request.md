@@ -13,13 +13,14 @@ When a consumer navigates to any site, the tech on that site can register data f
 const myGroup = {
    'owner': 'https://www.dsp.site',
    'name': 'athletes',
+   'visibleOnlyToOwner': false,
    'updateUrl': '.../update-IG?id=athletes',
    'biddingLogicUrl': '.../biddingLogic.js',
    'userBiddingSignals': ["Federer", "Schiffrin", "Ewing"],
-    'trustedBiddingSignalsUrl': '.../real-time-lookups',
-    'trustedBiddingSignalsKeys': ['CampaignOne', 'CampaignTwo']
+   'trustedBiddingSignalsUrl': '.../real-time-lookups',
+   'trustedBiddingSignalsKeys': ['CampaignOne', 'CampaignTwo']
 }
- const joinPromise = navigator.joinAdInterestGroup(myGroup, TTLInSeconds);
+const joinPromise = navigator.joinAdInterestGroup(myGroup, TTLInSeconds);
 ```
 
 (See [API details](API%20Details.md) for a formal specification of the IG structure and joinAdInterestGroup signature. Note "..." in URLs is meant to reduce text; the entire URL is required).
