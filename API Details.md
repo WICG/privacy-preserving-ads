@@ -22,17 +22,18 @@ To enable the advertiser to choose the most relevant ad for a specific user and 
 const myGroup = {
   'owner': 'https://www.example-dsp.site',
   'name': 'womens-running-shoes',
+  'visibleOnlyToOwner': false,
   'priority': 0.0,
   'priorityVector': {
     'signal1': 2,
     'signal2': -3.5,
     ...
-  }
+  },
   'prioritySignalsOverrides': {
     'signal1': 4.5,
     'signal2': 0,
     ...
-  }
+  },
   'enableBiddingSignalsPrioritization' : true,
   'biddingLogicURL': ...,
   'biddingWasmHelperURL': ...,
@@ -48,6 +49,8 @@ const joinPromise = navigator.joinAdInterestGroup(myGroup, 30 * kSecsPerDay);
 The API allows data that would traditionally be collected and stored server side and referenced/looked up via the use of third-party cookies to instead be stored locally within  the user's browser profile. This shifts the data into the control of the user where they can more easily and confidently see what data is collected and used, provides control to delete or opt out, and allows the browser to protect the user by enforcing constraints on the data uniqueness (to prevent microtargeting or hidden PII) as well as determining how and when the data can be safely used.
 
 Additionally, there is a complementary `navigator.leaveAdInterestGroup(myGroup)` API and embedded browser controls to manage this data. See additional information at [Protected Audiences - Browsers Record Interest Groups](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#1-browsers-record-interest-groups).
+
+The addition of a `visibleOnlyToOwner` boolean parameter, with a default value of *true*, can be used to control if a given InterestGroup has broader, but still private-to-the-auction, visibility during a private auction.
 
 ### 2.0 Ad auction/selection
 #### 2.1 Starting a server auction
