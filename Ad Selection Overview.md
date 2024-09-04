@@ -49,7 +49,7 @@ We are exploring whether additional tightening of the DP/K constraints are neces
 - Require TEE-based K/V services earlier or in specific cases.
 
 ## Dynamic creative selection
-The buyer will have the opportunity to look up creatives dynamically in the Buyer Front End, with both the BFE and Seller Front End (SFE) playing roles in enforcing K-anonymity and K-noising. This will significantly improve the ergonomics of the system for buyers, especially ones that make object changes programmatically, while keeping the required DP/K guarantees.
+ The buyer will have an opportunity to use all possible creatives from their database for selection without placing cany creatives in IGs directly. All creatives can be used in "selection" for every auction - this is possible because of a specific TEE-based service that allows to use creatives linked with specific words or to find creatives linked to embeddings using a DiskANN algorithm. All auction results will still be constrained by K-anonymity and K-noising, but we believe that providing the opportunity for dynamic creative selection allows everyone to have better ad quality improved outcomes. 
 
 ## Server-side only to avoid shared services and ownership
 We support the long-term vision of moving as much processing to client-side compute as possible. It can improve data security and privacy while reducing transaction costs and server-based carbon emissions. However, in the short term the current state of client-side proposals cannot yet sufficiently support ad tech:
