@@ -176,6 +176,8 @@ Based on the `resolveToConfig` auctionConfig parameter passed in auction initiat
 
 # Step 5: Pricing and reporting
 ## Event Level Reporting
+For more details, see [**Auction Reporting**](Auction%20Reporting.md).
+
 The winning DSP and SSP now can send Event Level Reports back to their home servers for ingestion, processing, billing, and reporting:
 - The winning DSP can send results using the `reportWin` function. The buyer-provided endpoint for `generateBid()` is expected to contain the `reportWin` function.
 - The SSP can send results using the `reportResult` function. The seller-provided endpoint for `scoreAd` contains the `reportResult` function.
