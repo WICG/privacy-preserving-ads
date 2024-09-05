@@ -1,8 +1,6 @@
-# Ad Selection API Attribution Reporting for Alpha
+# Attribution Reporting
 ## Overview
-For the alpha release of Ad Selection API, we want to enable and support a limited version of ads reporting in Edge. 
-
-Attribution reporting is a strategy that allows marketers and sales teams to track the impact of their marketing efforts on specific goals, such as purchases or sales.  Traditionally, ad conversion measurement relied on third-party cookies, which could be used to track users across sites and raised privacy concerns. To facilitate these measurements without tracking, a new reporting API is required.  For the alpha release of Ad Selection API, Microsoft Edge intends to support a limited version of reporting, with reports being sent per-event. Future work includes replacing these event-level reports with aggregation reporting.
+Attribution reporting is a strategy that allows marketers and sales teams to track the impact of their marketing efforts on specific goals, such as purchases or sales.  Traditionally, ad conversion measurement relied on third-party cookies, which could be used to track users across sites and raised privacy concerns. To facilitate these measurements without tracking, a new reporting API is required.  Microsoft Edge is supporting a limited version of reporting, with reports being sent per-event. Future work includes replacing these event-level reports with aggregation reporting.
 
 # Attribution Sources
 There are two types of attribution sources - navigation and event sources.  An attribution source is eligible for reporting if any page on any of the associated destination sites (advertiser sites) triggers attribution for the associated reporting origin.

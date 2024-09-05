@@ -16,6 +16,7 @@ Since this API leverages similar concepts from other proposals, some of the conc
 1. Proposal overview
      1. [**Ad Selection API overview**](Ad%20Selection%20Overview.md): an overview of the Ad Selection API, including the rationale for a new proposal
      1. [**API differences**](API%20Differences.md): a high-level overview of differences between Ad Selection API and other industry proposals.
+     1. [**Attribution Reporting**](Attribution%20Reporting.md)
 1. Data flows & examples
      1. [**Auction & infrastructure design**](Auction%20&%20Infrastructure%20Design.md)
      1. [**Life of an ad request**](Life%20of%20an%20Ad%20Request.md)
