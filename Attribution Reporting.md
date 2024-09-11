@@ -3,7 +3,7 @@
 Attribution reporting is a strategy that allows marketers and sales teams to track the impact of their marketing efforts on specific goals, such as purchases or sales.  Traditionally, ad conversion measurement relied on third-party cookies, which could be used to track users across sites and raised privacy concerns. To facilitate these measurements without tracking, a new reporting API is required.  Microsoft Edge is supporting a limited version of reporting, with reports being sent per-event. Future work includes replacing these event-level reports with aggregation reporting.
 
 # Attribution Sources
-There are two types of attribution sources - navigation and event sources.  An attribution source is eligible for reporting if any page on any of the associated destination sites (advertiser sites) triggers attribution for the associated reporting origin.
+There are two types of attribution sources - navigation and event sources.  An attribution source is eligible for reporting if any page on any of the associated destination sites (advertiser sites) triggers attribution for the associated reporting origin.  The "attributionsrc" attribute can be used to designate which server contains your requested resource.  If the requested resource is owned by the same server that handles the registration, "attributionsrc" can be left blank.
 
 ## Navigation Sources (Click)
 Navigation sources are activated when a navigation occurs within the [transient user activation](https://html.spec.whatwg.org/multipage/interaction.html#transient-activation) time frame.  There are two ways to register navigation sources.
@@ -62,8 +62,9 @@ See [Attribution-Reporting-Register-Source](https://developer.mozilla.org/en-US/
 Once attribution sources have been registered, attribution triggers must be registered.  An attribution source is eligible for reporting if any page on any of the destination sites triggers attribution for the associated reporting origin.
 
 There are two types of attribution triggers – HTML based and Javascript based.
+
 ## HTML Based Triggers
-HTML-based attribution triggers can be used for detecting conversions on a page when an \<img> or \<script> element loads.  You can register an attribution trigger by adding the attributionsrc attribute to the appropriate element. The registration request is sent to the URL inside the attributionsrc value. If you leave the attributionsrc  value blank, the registration request will be sent to the server the requested resource is hosted on.
+HTML-based attribution triggers can be used for detecting conversions on a page when an \<img> or \<script> element loads.  You can register an attribution trigger by adding the attributionsrc attribute to the appropriate element. The registration request is sent to the URL inside the attributionsrc value. If you leave the attributionsrc value blank, the registration request will be sent to the server the requested resource is hosted on.
 ```
 <img src="https://advertiser.example/conversionpixel" attributionsrc="https://adtech.example/attribution_trigger?purchase=456">
 ```
@@ -95,7 +96,7 @@ const attributionReporting = {
 };
 
 function triggerMatching() {
-  const req = newXMLHttpRequest();
+  const req = new XMLHttpRequest();
   req.open("GET", https://shop.example/endpoint");
 
   if (typeof req.setAttributionReporting === "function") {
@@ -152,7 +153,7 @@ Navigation source conversion reports are sent following a more complex schedule 
 ### Customizable Values:
 There are two values that can be used to customize report transmission times available as fields within the Attribution-Reporting-Register-Source header: report windows and expiration values.
 #### Report Windows:
-Report windows designate  how often reports will be sent.  The fields for customizing these values are:
+Report windows designate how often reports will be sent.  The fields for customizing these values are:
 - event_report_window: A string representing a time in seconds, after which subsequent triggers won't be attributable to this source for the purpose of producing event-level reports (this is called a report window). If not set, the event report window falls back to the "expiry" value.
 - event_report_windows: An object representing a series of report windows, starting at "start_time", with reports for this source being delivered after each specified end time in "end_times". This can be used to vary the time of report delivery across multiple reports. If not set, the event report window falls back to the "expiry" value. Properties are as follows:
 - "start_time" Optional: A non-negative number specifying the start time for the reporting windows. If not specified, it defaults to 0.
@@ -170,7 +171,7 @@ The soonest value permitted for report windows and expiration values is 1 day. T
 Reports may not be sent exactly at the scheduled dates and times. If the browser isn't running when a report is scheduled to be sent, the report is sent at browser startup. The browser may also decide to delay some of these reports for a random, but short, duration. This duration should be no more than an hour.
 
 ## Attribution Reports Data
-To send a report, the browser will make a non-credentialed (i.e. without session cookies) secure HTTP POST request to:
+To send a report, the browser will make a non-credentialed (i.e. without session cookies) HTTPS POST request to:
 ```
 https://<reporting origin>/.well-known/attribution-reporting/report-event-attribution
 ```
