@@ -207,7 +207,8 @@ However, in order to significantly reduce payload size of the response, the Bidd
 ## Pricing
 The `reportResult` function has access to additional data useful in determining the final pricing of the win.
 
-
+## Attribution Reporting
+For more information about attribution reporting, please see [**Attribution Reporting**](Attribution%20Reporting.md).
 
 
 
