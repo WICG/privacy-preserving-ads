@@ -40,7 +40,7 @@ We want to make it easy for ad techs to interoperate between the Protected Audie
 - Feature compatibility: features that work in Protected Audience API will often work in Ad Selection API as well and, where they do not, the behavior differences should be easy to reason about.
 
 ## Transient, trusted, and opaque multi-domain signals with differential privacy and k-anonymity output constraints
-Interest Groups continue to be stored, both at rest and in transit, partitioned and encrypted by domain. However, the buyer front end (BFE) will allow the Interest Groups of a single owner to be merged prior to invocation of the `generateBid` bidding function. We will still require the creative URL and associated reporting values to meet the same DP/K requirements as proposed by the Protected Audience API.
+Interest Groups continue to be stored, both at rest and in transit, partitioned and encrypted by domain. However, the buyer front end (BFE) will allow the Interest Groups of a single owner to be merged prior to invocation of the `generateBids` bidding function. We will still require the creative URL and associated reporting values to meet the same DP/K requirements as proposed by the Protected Audience API.
 
 We are exploring whether additional tightening of the DP/K constraints are necessary to achieve our privacy goals while enabling the merging functionality. Ideas we've discussed so far include:
 - Increasing K.
@@ -49,7 +49,7 @@ We are exploring whether additional tightening of the DP/K constraints are neces
 - Require TEE-based K/V services earlier or in specific cases.
 
 ## Dynamic creative selection
- The buyer will have an opportunity to use all possible creatives from their database for selection without placing cany creatives in IGs directly. All creatives can be used in "selection" for every auction - this is possible because of a specific TEE-based service that allows to use creatives linked with specific words or to find creatives linked to embeddings using a DiskANN algorithm. All auction results will still be constrained by K-anonymity and K-noising, but we believe that providing the opportunity for dynamic creative selection allows everyone to have better ad quality improved outcomes. 
+ The buyer will have an opportunity to use all possible creatives from their database for selection without placing any creatives in IGs directly. All creatives can be used in "selection" for every auction. This is possible because of a specific TEE-based service that allows to use creatives linked with specific words or to find creatives linked to embeddings using a DiskANN algorithm. All auction results will still be constrained by K-anonymity and privacy preserving thresholds, but we believe that providing the opportunity for dynamic creative selection allows everyone to have better ad quality improved outcomes. 
 
 ## Server-side only to avoid shared services and ownership
 We support the long-term vision of moving as much processing to client-side compute as possible. It can improve data security and privacy while reducing transaction costs and server-based carbon emissions. However, in the short term the current state of client-side proposals cannot yet sufficiently support ad tech:

@@ -31,9 +31,8 @@ Some of the features that are highlighted will require changes in browser API, i
 
 | New logic | Description |
 | - | - |
-| New Bidding’s hook – FetchAdditionalSignals. | New hook for looking up additional signals will be available from the Bidding worklet. </p>More details - [New hook logic]( Bidding%20Service%20functionality.md). |
-| Changes in input and output of bidding | At the moment of bidding, Buyer will have access to all InterestGroups owned by Buyer. <br>Bidding can return dynamic `render_url` and InterestGroup as a winner. </p>More details - [New bidding functionality](Life%20of%20an%20Ad%20Request.md#L98-L99). |
+| New Bidding’s hook – FetchAdditionalSignals. | New hook for looking up additional signals will be available from the Bidding worklet. </p>More details - [New hook logic]( Bidding%20Service%20functionality.md#4). |
+| Changes in input and output of bidding | At the moment of bidding, Buyer will have access to all InterestGroups owned by Buyer. <br>Bidding can return dynamic `render_url` and InterestGroup as a winner. </p>More details - [New bidding functionality](Bidding%20Service%20functionality.md#L98). |
 | New logic in Key/Value service | Key/Value service will support new algos that can provide more effective way for ad selection process (e.g., DiskANN algorithm). </p>More details - [Ad Candidate Real-time Selection](Ad%20Candidate%20Real-time%20Selection.md). |
-| Browser API changes | The logic of several methods in browser API for auction and reporting are changed. </p> Details will be added soon.  |
 | Azure support | Ad Selection API can be deployed in Azure. </p> Details will be added soon. |
 | K-anon service | K-anon – new service that need to be deployed by Buyer that will be used for calculation of k-anonymity counters.  </p> Details will be added soon. |

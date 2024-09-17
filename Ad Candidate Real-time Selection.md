@@ -2,7 +2,9 @@
 
 One of the major features of the Ad Selection API is its ability to allow Ad Techs to select ad auction candidates from large candidate databases in real time, without being restricted to a limited list of creatives matched to an exact Interest Group. This solution was designed with two key considerations in mind: preventing data leakage from the secure TEE environment and ensuring the usability and applicability of the approach.
 
-Our primary concept is to provide a configurable, ready-to-deploy container that can be used for real-time selection. In this setup, all Ad Techs need to do is deploy the container using the prepared scripts, configure it, and upload their candidates to the cloud. Additionally, Ad Techs will need to prepare UDF that can be included as part of the configuration.
+Our primary concept is to provide a configurable, ready-to-deploy container that can be used for real-time selection. In this setup, all Ad Techs need to deploy the container using the prepared scripts, configure it, and upload their candidates to the cloud. Additionally, Ad Techs will need to prepare UDF that can be included as part of the configuration.
+
+Selection logic will be part of the existing Key/Value service, which already uses a TEE (Trusted Execution Environment) for data privacy. The Key/Value service will be updated to support selection logic and allow the implementation of new algorithms for selection.
 
 The selection process itself can occur in one of two ways:
 
@@ -10,8 +12,8 @@ The selection process itself can occur in one of two ways:
 - Embedding-based selection: Embeddings of all possible candidates are grouped into an ANN (Approximate Nearest Neighbor) index. In this case, the index is uploaded into the container and used to find the nearest neighbors during the ad request using embeddings from the request.
 
 ## Ad Selection API selection request flow
-The selection workflow is initiated during the ad request, starting with a Bidding Service UDF call. During this call, the UDF can trigger a selection request to the container (referred to here as the KVS service). This is accomplished through a specific hook that triggers an external request to a pre-registered TEE service. After the request to KVS, another UDF call is triggered inside KVS, allowing it to utilize both the `GetValues` and `GetNearestNeighbors`  hooks — the former for KV lookups and the latter for ANN queries. Once the request is executed, the UDF on the KVS side processes the data and responds to the Bidding Service, where the Bidding UDF can use the new candidates in the auction. This workflow is illustrated in the diagram below:
-<span style="display:block;text-align:center">![Ad Selection workflow](images/adsapi_end_to_end_workflow.png)</span>
+The selection workflow is initiated during the ad request, starting with a Bidding Service UDF call to the `generateBids` user defined function(UDF). During this call, the UDF can trigger a selection request to the container (referred to here as the KVS service). This is accomplished through a specific hook that triggers an external request to a pre-registered TEE service. After the request to KVS, another UDF call is triggered inside KVS, allowing it to utilize both the `GetValues` and `GetNearestNeighbors`  hooks — the former for KV lookups and the latter for ANN queries. Once the request is executed, the UDF on the KVS side processes the data and responds to the Bidding Service, where the Bidding UDF can use the new candidates in the auction. This workflow is illustrated in the diagram below:
+<span style="display:block;text-align:center">![Ad Selection workflow](images/end_to_end_workflow.png)</span>
 
 ## Key/Value Service specifications
 The KVS image will utilize an open-source service. This service allows you to upload a Key-Value database and indexes for use in ANN selection.
@@ -27,12 +29,14 @@ Internally, the KVS manages several independent components:
 - **Roma and Sandbox**: Executes UDFs (User-Defined Functions).
 
 ## Key/Value Service request lifetime
-Once the server receives a request, it is almost immediately passed to the UDF, which then determines how to process it. The UDF has access to several hooks, including `GetValues` and `GetNearestNeighbors`. When `GetValues` is called, the KVS looks up each key from the hook's input and returns the corresponding values. When `GetNearestNeighbors`  is called, instead of a direct lookup, an ANN search is initiated, resulting in a set of candidates — the closest neighbors. These results are then accessible to the UDF, whose role is to package these results as the KVS response.
+Once the server receives a request, it is almost immediately passed to the UDF, which then determines how to process it. The UDF has access to several hooks(javascript API methods available for UDF worklet), including `GetValues` and `GetNearestNeighbors`. When `GetValues` is called, the KVS looks up each key from the hook's input and returns the corresponding values. When `GetNearestNeighbors`  is called, instead of a direct lookup, an ANN search is initiated, resulting in a set of candidates — the closest neighbors. These results are then accessible to the UDF, whose role is to package these results as the KVS response.
 
 In most cases, the UDF code for selection will performs three main tasks: accepting the UDF input, directing it to the appropriate hook, and packaging the hook's response as the UDF's output.
 
 ## KVS request/response schema
 ### KVS request schema (same as ad retrieval v2 kvs schema)
+
+This schema is the unmodified KVS v2 schema from Google’s service [Protected Auction Key/Value Service](https://github.com/privacysandbox/protected-auction-key-value-service). The UDF triggers a request where all information for a specific model, selection type, or service type is passed within a single Partition, though it may be split into several "Argument" sections (keyword groups). For instance, if we want to trigger a call for one model, we place the data in one partition; for a different selection type, we use another partition. All actual keys or embeddings are stored in the "Argument" message with the tag "keys." If we need to specify a model name, we pass an "Argument" message with the tag "model" to indicate which model should be triggered. Similarly, if we need to pass user information or additional data, we use the "Argument" message with the tag "add," and this information will be passed to the UDF on the KVS side.
 ```proto
 message Request {
     message Partition {
@@ -56,7 +60,16 @@ message Request {
 }
 ```
 
-This schema is the unmodified KVS v2 schema from Google’s service [Protected Auction Key/Value Service](https://github.com/privacysandbox/protected-auction-key-value-service). The UDF triggers a request where all information for a specific model, selection type, or service type is passed within a single Partition, though it may be split into several "Argument" sections (keyword groups). For instance, if we want to trigger a call for one model, we place the data in one partition; for a different selection type, we use another partition. All actual keys or embeddings are stored in the "Argument" message with the tag "keys." If we need to specify a model name, we pass an "Argument" message with the tag "model" to indicate which model should be triggered. Similarly, if we need to pass user information or additional data, we use the "Argument" message with the tag "add," and this information will be passed to the UDF on the KVS side.
+Sample code snippet of how to call hook and how to use result:
+
+```javascript
+function callFindNearestNeighbors(lookupData) {
+    ...
+    const rawResult = GetNearestNeighbors(lookupData);
+    const result = JSON.parse(rawResult);
+    ...
+}
+```
 ### KVS Response Schema (same as ad retrieval v2 kvs schema)
 
 ```proto

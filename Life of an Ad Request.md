@@ -32,7 +32,7 @@ The interest group can be updated in two ways:
 ### Usage
 Once the athletes IG has been successfully joined, the IG will live in the browser for the specified TTL. It will be able to participate in any Private Auction to which the publisher has invited its owner. The publisher can include either all owner's IGs available on the browser, or list DSP domains which will match on the `owner` field of the IGs.
 
-To participate in an auction, the `biddingLogicUrl` must contain a function named `generateBid`. The Auction Framework will invoke that function and pass the entire IG, including `userBiddingSignals`, as well as the result of a call to `trustedBiddingSignalsUrl`. The `generateBid` function can return 0 or more bids for consideration by the SSPs ranking function. See Step 4 for more details.
+To participate in an auction, the `biddingLogicUrl` must contain a function named `generateBids`. The Auction Framework will invoke that function and pass the entire IG, including `userBiddingSignals`, as well as the result of a call to `trustedBiddingSignalsUrl`. The `generateBids` function can return 0 or more bids for consideration by the SSPs ranking function. See Step 4 for more details.
 
 ### Summary
 Step 0 is the precursor to a useful Private Auction running. The state of the world after DSP code on different sites joins IGs looks like this and forms the basis for the next steps.
@@ -40,7 +40,7 @@ Step 0 is the precursor to a useful Private Auction running. The state of the wo
 <span style="display:block;text-align:center">![Life of an Ad Request Step 0](images/life_of_an_ad_step0.png)</span>
 
 
-# Step 1: Private auction initiation and workflow
+# Step 1: Private auction initiation
 After visiting her favorite sports and clothing sites, the consumer then goes to a publisher's website. The publisher makes some of their revenue based on advertising and believes advertisers will bid more if they can use their own data, so they run a private auction using the Ad Selection API.
 
 ## Combined ad request
@@ -99,13 +99,13 @@ Once the auction has been sent to the seller front end TEE, the ad auction begin
 ## TEEs
 
 The seller front end will send one request to the TEEs of each DSP included in the `auctionConfig.interestGroupBuyers` with at least one interest group participating (joined and not [filtered out](https://github.com/WICG/turtledove/blob/main/FLEDGE.md#35-filtering-and-prioritizing-interest-groups) via `priorityVector`) in the private auction. The DSP's TEEs will receive all the IGs that have previously been registered via the calls to `joinAdInterestGroup` in Step 0 that have not expired. The DSP has two TEEs:
-- Buyer Front End Service: receives the request, fetches real time bidding signals, performs the merge functions, and invokes the generateBid functions by sending a request to a Bidder Service.
+- Buyer Front End Service: receives the request, fetches real time bidding signals, performs the merge functions, and invokes the `generateBids` functions by sending a request to a Bidder Service.
 - Bidding Service: handles the execution of the bidding process and returning 0 or more bids to the buyer front end (BFE).
 
 
 ## Biddding WorkFlow
 Schema below describe end to end workflow for private auction.
-<span style="display:block;text-align:center">![Ad Selection workflow](images/adsapi_end_to_end_workflow.png)</span>
+<span style="display:block;text-align:center">![Ad Selection workflow](images/end_to_end_workflow.png)</span>
  
 
 - **1.1.** SellerFrontEnd sends request to BuyerFrontEnd. 
@@ -114,16 +114,16 @@ Schema below describe end to end workflow for private auction.
 - **2.2.** Key-Value-Service sends response to BFE. 
 <br>**BFE – Bidding Service**
 - **3.1.** BFE sends request to Bidding Service. 
-- **3.2.** Bidding Service creates [Invocation Requests](https://github.com/privacysandbox/data-plane-shared-libraries/blob/a42a0702c7af9b001e0609f604988ed21541abbd/src/roma/interface/roma.h#L75) for the Roma Service to execute `generateBid` JavaScript function. Interest Groups are part of Invocation Request and by default they are combined it into one request. After that request is sent to Roma Service.
+- **3.2.** Bidding Service creates [Invocation Requests](https://github.com/privacysandbox/data-plane-shared-libraries/blob/a42a0702c7af9b001e0609f604988ed21541abbd/src/roma/interface/roma.h#L75) for the Roma Service to execute `generateBids` JavaScript function. Interest Groups are part of Invocation Request and  they are combined it into one request. After that request is sent to Roma Service.
 - **3.3.** Roma Service assigns workers to each Invocation Request and they start execution JavaScript code in Google V8 Isolate. 
-- **4.0.** Start execution of `generateBid` JavaScript function. 
+- **4.0.** Start execution of `generateBids` JavaScript function. Some logic that initiate bidding process and prepate input data can be run. 
 - **4.1.** Inside JavaScript code AdTech calls predefined JavaScript function `fetchAdditionalSignals` to send Request to Key-Value-Services (KVS).
 - **4.2.** Function call `fetchAdditionalSignals` is redirected by Roma Service to Routing Utils where request is encrypted and sent to KVS.
 - **4.3.** KVS executes the lookup logic and returns response (or timeout) to Routing Utils which decrypt response and return it back to the Roma Service. 
 - **4.4.** Roma Service passing response back to JavaScript code and it start processing further.
-- **5.1.** `generateBid` JavaScript function returns bids. No changes in return object structure [AdWithBid](https://github.com/privacysandbox/bidding-auction-servers/blob/332f7e143c7aabb995ffb616cfc248a3efeb0292/api/bidding_auction_servers.proto#L875) with Privacy Sandbox solution. The difference is that instead of one `AdWithBid` function returns array of it.
+- **5.1.** `generateBids` JavaScript function returns bids. No changes in return object structure [AdWithBid](https://github.com/privacysandbox/bidding-auction-servers/blob/332f7e143c7aabb995ffb616cfc248a3efeb0292/api/bidding_auction_servers.proto#L875) with Privacy Sandbox solution. The difference is that instead of one `AdWithBid` function returns array of it.
 - **5.2.** Roma Service returns Response Object with bids back to the Bidding Service. 
-- **5.3.** Bidding Service returns result to BFE.
+- **5.3.** Bidding Service returns result to BFE. 
 - **5.4.** BFE responses to SFE. 
 
 ## 2.1 BuyerFrontEnd workflow 
@@ -134,90 +134,16 @@ The BFE receives the request and makes a call to the DSPs key-value (KV) server 
 - Campaign settings, such as an active status, updated targeting, etc.
 - Creatives to render and have K-checked.
 
-The BFE receives the response from the KV server, routes them into the IGs as indicated, and then sends the requests to the Bidding Service for the `generateBid` function to run. After the bidding is complete, each BFE receives the results of its calls to `generateBid` and returns them to the seller front end.
-
-Creatives in Trusted Signals Reference the recognized key for creatives that can result in the system initiating k looks ups for the renders. https://github.com/WICG/turtledove/issues/729#issuecomment-1747677272
+The BFE receives the response from the KV server, routes them into the IGs as indicated, and then sends the requests to the Bidding Service for the `generateBids` function to run. After the bidding is complete, each BFE receives the results of its calls to `generateBids` and returns them to the seller front end.
 
 ## 2.2 Bid Generation. Multiple IGs processing
-Ad Selection API by default will combine all the IGs into one Invocation Request, and send them to  the Bidding UDF `generateBid` (there is a possibility to isolate IG in one Invocation Request). Inside `generateBid` JavaScript there is access to all IGs and it will be possible to make bidding process more accurate.
+Ad Selection API by default will combine all the IGs into one Invocation Request, and send them to  the Bidding UDF `generateBids` (there is a possibility to isolate IG in one Invocation Request). Inside `generateBids` JavaScript there is access to all IGs and it will be possible to make bidding process more accurate.
 
-Now `generateBid` function as importing parameter accepts one IG, but it will be modified and it will be array of IGs. As returning type for bid `AdWithBid` also will be changed to array of `AdWithBid`.
+Now `generateBids` function as importing parameter accepts one IG, but it will be modified and it will be array of IGs. As returning type for bid `AdWithBid` also will be changed to array of `AdWithBid`.
 
-### Input parameters of generateBid
+Moreover `generateBids` can return multiple bids for evaluation by the seller's auction code.
 
-| Parameter Name | Parameter value |
-| - | - |
-| interest_group**s** | Array of IGs |
-| auction_signals | Map of signals where key is IG name and value is array of signals |
-| buyer_signals | Map of signals where key is IG name and value is array of signals |
-| trusted_bidding_signals | Array of signals  |
-| device_signals | 	Array of signals |
-
-### Returning parameter
-
-| Parameter Name | Parameter value |
-| - | - |
-| response | Array of structure [AdWithBid](https://github.com/privacysandbox/bidding-auction-servers/blob/332f7e143c7aabb995ffb616cfc248a3efeb0292/api/bidding_auction_servers.proto#L875) |
-
-In the Ad Selection API, multiple bids can be returned for evaluation by the seller’s auction code. Besides new IGs names or/and render URLs can be returned. Each bid has the same shape as the bid returned in the Protected Audience auction, and we support compatibility.
-
-The `render` element can take two forms:
--	A single string representing the `renderURL`.
--	An object with `renderURL` and width and height, which the frame will use to help size the frame that the ad appears in. Note that in the case of using the size option, k-anon will include the size in its tuple.
--	The response returned is a json string array containing a single or multiple Interest Groups.
-
-
-
-In the Ad Selection API, multiple bids can be returned for evaluation by the seller's auction code.
-The `render` element can take two forms:
-- A single string representing the `renderURL`.
-- An object with renderURL and width and height, which the frame will use to help size the frame that the ad appears in. Note that in the case of using the size option, k-anon will include the size in its tuple.
-
-Code example for `generateBid` usage:
-```javascript
-generateBid(interest_groups, auction_signals, buyer_signals, trusted_bidding_signals, device_signals) {
-  ...
-  return {
-    'response': [{
-          'ad': adObject,
-          'bid': bidValue,
-          'render': renderUrl,
-          'adComponents': ["adComponentRenderUrlOne", "adComponentRenderUrlTwo"],
-          'allowComponentAuction': false,
-          'interestGroupName': dynamic_ig_name
-    }],
-    'logs': ps_logs,
-    'errors': ps_errors,
-    'warnings': ps_warns
-}
-```
-
-Response example with single Bid
-```json
-{
-    "response": [{
-      "render": "https://adTech.com/ad?id=123",
-      "bid": 1,
-      "interestGroupName": "ig_name"
-    }],
-    "logs": ["test log"],
-    "errors": ["test.error"],
-    "warnings":["test.warn"]
-}
-```
-
-Response example with multiple Bids
-```json
-{
-    "response": [
-        {"render": "https://adTech.com/ad?id=123","bid": 1,"interestGroupName": "ig_name_Foo"},
-        {"render": "https://adTech.com/ad?id=456","bid": 2,"interestGroupName": "ig_name_Bar"}
-    ],
-    "logs": ["test log"],
-    "errors": ["test.error"],
-    "warnings":["test.warn"]
-}
-```
+More details and example of usage - [Updated bidding functionality](Bidding%20Service%20functionality.md#L98)
 
 # Step 3: Private auction scoring
 ## Ad scoring
@@ -251,12 +177,12 @@ const auctionResultPromise = navigator.runAdAuction({
 });
 ```
 
-Based on the `resolveToConfig` auctionConfig parameter passed in auction initiation, the creative will be rendered in either a fenced frame or an iframe. If returned from `generateBid` the size is used to populate the width and height of the fenced frame or iframe, either via fenced frame config or parameters associated with the opaque URL.
+Based on the `resolveToConfig` auctionConfig parameter passed in auction initiation, the creative will be rendered in either a fenced frame or an iframe. If returned from `generateBids` the size is used to populate the width and height of the fenced frame or iframe, either via fenced frame config or parameters associated with the opaque URL.
 
 # Step 5: Pricing and reporting
 ## Event Level Reporting
 The winning DSP and SSP now can send Event Level Reports back to their home servers for ingestion, processing, billing, and reporting:
-- The winning DSP can send results using the `reportWin` function. The buyer-provided endpoint for `generateBid()` is expected to contain the `reportWin` function.
+- The winning DSP can send results using the `reportWin` function. The buyer-provided endpoint for `generateBids()` is expected to contain the `reportWin` function.
 - The SSP can send results using the `reportResult` function. The seller-provided endpoint for `scoreAd` contains the `reportResult` function.
 
 Both the `reportWin` and `reportResult` function will have constrained data access and egress ability:
@@ -304,7 +230,7 @@ We've walked through the steps in detail here, but to summarize:
 1. The seller ad service forms the `auctionConfig`, including any `perBuyerSignals` returned by the bidders in step (3), and sends that along with the encrypted IGs to its seller front end (SFE) service TEE.
 1. The seller front end TEE coordinates sending the IGs to the appropriate buyer front end TEEs.
 1. The buyer front end (BFE) TEE invokes the owners merge function, calls the `trustedBiddingSignalsURL`, and routes the IGs to the buyer bidding service for bidding.
-1. The bidding service invokes `generateBid`, and returns 0-or-more bids back to the BFE, which sends them back to the SFE.
+1. The bidding service invokes `generateBids`, and returns 0-or-more bids back to the BFE, which sends them back to the SFE.
 1. The SFE now handles calling the `trustedScoringSignalsURL` with the `renderURL`s of the returned bids, and sends the bids with the trusted signals to the auction service for scoring.
 1. The auction service invokes `scoreAd` as registered in the `auctionConfig` for each bid, and returns the highest ranking bid, or no bids. In the case of the Private Bid winning, reportResult and reportWin are invoked to generate the URLs to be sent on render.
 1. Seller ad service returns the winning bid to the client.
