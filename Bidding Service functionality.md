@@ -48,7 +48,7 @@ When UDF sends a request to KVS in the `RoutingRequest`, you need to specify the
 <span style="display:block;text-align:center">![Routing communication shema](images/routing_util_detailed.png)</span>
 
 ### Request Example in bidding UDF
-```js
+```javascript
 function generateBids(interest_group, auction_signals, buyer_signals, trusted_bidding_signals, device_signals) {
 
 const batchKVGetValuesRequest = {
@@ -76,14 +76,6 @@ const batchKVGetValuesRequest = {
               ],
             },
           ],
-          consented_debug_config: {
-            is_consented: true,
-            token: 'debug_token',
-          },
-          log_context: {
-            generation_id: 'client_UUID',
-            adtech_debug_id: 'adtech_debug_test',
-          },
         },
       },
     ],
@@ -91,6 +83,20 @@ const batchKVGetValuesRequest = {
 
   const jsonRequest = JSON.stringify(batchKVGetValuesRequest);
   const fetchAdditionalSignalsResult = fetchAdditionalSignals(jsonRequest);
+
+  return {
+    'response': [{
+          'ad': adObject,
+          'bid': bidValue,
+          'render': renderUrl,
+          'adComponents': ["adComponentRenderUrlOne", "adComponentRenderUrlTwo"],
+          'allowComponentAuction': false,
+          'interestGroupName': dynamic_ig_name
+    }],
+    'logs': ps_logs,
+    'errors': ps_errors,
+    'warnings': ps_warns
+  }
 ```
 
 -  `GetValueRequest` is the structure from [KVS proto file](https://github.com/privacysandbox/protected-auction-key-value-service/blob/release-0.16/public/query/v2/get_values_v2.proto#L105).
