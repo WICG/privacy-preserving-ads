@@ -18,18 +18,7 @@ Each stack has two major configuration components.
 ### Server Binary Runtime Flags
 
 Numerous flags are consumed by the service binaries. The flags are specified via **buyer.yaml** and
-**seller.yaml** files under `/services/app/helm`. Because each service consumes many unique flags,
-there are two sources to check in order to gain a full understanding of each flag:
-
-1. In the codebase, please familiarize yourself with `services/<service_name>/runtime_flags.h` (such
-   as `services/auction_service/runtime_flags.h`). These header files serve as the ultimate source
-   of truth for the flags unique to the service. For descriptions of each flag, you can search their
-   corresponding `ABSL_FLAG` definition (typically the name of the flag but all snakecase). For
-   usage of each flag, consider searching the codebase for the flag name in all uppercase.
-1. For flags common to all services, please inspect
-   `services/common/constants/common_service_flags.h`. For learning more about these flags and how
-   these integrate with the codebase, you can use the same principles as from step 1. For examples,
-   please refer to `./buyer/buyer.tf` and `./seller/seller.tf`.
+**seller.yaml** files under `/services/app/helm`. 
 
 ### Azure Architecture Flags
 
