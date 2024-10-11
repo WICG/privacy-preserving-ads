@@ -1,6 +1,7 @@
-# Azure
+# Scripts to deploy services of Ad Selection API to Azure
  
-Please see the AdSAPI start guide for sing up and build steps
-[here](https://go.microsoft.com/fwlink/?linkid=2289906).
-For deployment, please see
-[here](azure/terraform/environment/demo/README.md).
+To sign up for the Ad Selection API origin trial, see [Sign up for the Ad Selection API](https://learn.microsoft.com/microsoft-edge/web-platform/ad-selection-api).  
+
+To deploy services that support the Ad Selection API, see:
+1. [Demo Buyer and Seller Deployment scripts for Azure](azure/buyer-seller-services/environment/demo/README.md)
+2. [Demo Key Value Service Deployment scripts for Azure](azure/key-value-service/environment/demo/README.md)
