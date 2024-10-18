@@ -24,7 +24,6 @@ This table documents known differences at the time of publication. As this propo
 | Creative selection | Static, must declare at IG creation/update time | Dynamic. Dynamic `render_url` and dynamic interest group names can be generated in moment of bidding. New lookup algos will be available in Key/Value service to provide more effective ways to do selection. |
 | Data available for Bidding|BuyerSignals and separate InterestGroups connected with `TrustedSignals` from KV | `BuyerSignals`, all InterestGroups with `TrustedSignals` owned by Buyer, (optional) dynamic TrustedSignals from Key/Value Service through new hook in bidding (key for lookup is dynamic). |
 | TEE requirements | Public cloud | Public cloud and, depending on risk analysis potentially other locations (e.g. see the [UK's Cloud security guidance](https://www.ncsc.gov.uk/collection/cloud/the-cloud-security-principles) for potential approaches for establishing safety). |
-| Attribution | [Attribution Reporting API (ARA)](https://developer.chrome.com/en/docs/privacy-sandbox/attribution-reporting/) | ARA with modifications for better parity with CPA billing. |
 | Operations | Browser and Ad Tech share  critical infrastructure such as k-anon | Ad tech takes control, no shared infrastructure services. |
 
 Some of the features that are highlighted will require changes in browser API, in B&A code or some other technical implementation. All such changes are collected in the table below and are explained in more detail in other docs:
