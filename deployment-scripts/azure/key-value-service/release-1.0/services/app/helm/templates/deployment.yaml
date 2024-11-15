@@ -1,0 +1,99 @@
+# Portions Copyright (c) Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ range $name, $val := $.Values.services }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-app
+  namespace: {{ $.Values.namespace }}
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}-app
+      annotations:
+        microsoft.containerinstance.virtualnode.injectkubeproxy: "false"
+        microsoft.containerinstance.virtualnode.injectdns: "false"
+        microsoft.containerinstance.virtualnode.identity: {{ $.Values.virtualNodeIdentity | quote }}
+        microsoft.containerinstance.virtualnode.ccepolicy: {{ $val.ccePolicy | quote }}
+    spec:
+      containers:
+      - name: {{ $name }}
+        image: {{ $val.image }}
+        env:
+          {{- range $key, $val := $val.env }}
+          - name: {{ $key }}
+            value: {{ $val | quote }}
+          {{- end }}
+          {{- range $key, $val := $.Values.env }}
+          - name: {{ $key }}
+            value: {{ $val | quote }}
+          {{- end }}
+        ports:
+        {{- with $val.containerPorts }}
+        {{- range . }}
+        - containerPort: {{ .port }}
+        {{- end }}
+        {{- end }}
+        {{- with $val.healthCheck }}
+        - containerPort: {{ .port }}
+        readinessProbe:
+          grpc:
+            port: {{ .port }}
+          initiDelaySeconds: {{ .intialDelaySeconds | default 30 }}
+        {{- end }}
+        {{- with $val.resources }}
+        resources:
+          {{- with .requests }}
+          requests:
+            cpu: {{ .cpu | default "0.75" }}
+            memory: {{ .memory | default "2Gi" }}
+          {{- end }}
+          {{- with .limits }}
+          limits:
+            cpu: {{ .cpu | default "2" }}
+            memory: {{ .memory | default "8Gi" }}
+          {{- end }}
+        {{- end }}
+        volumeMounts:
+        {{- with $val.volumeMounts }}
+        {{- range . }}
+        - name: {{ .name }}
+          mountPath: {{ .mountPath }}
+          readOnly: true
+        {{- end }}
+        {{- end }}
+
+      volumes:
+      - name: {{ $val.volumeName | default "data-vol" }}
+        persistentVolumeClaim:
+          claimName: kv-pvc
+      nodeSelector:
+        type: virtual-kubelet
+        {{- with .nodeSelector }}
+        {{- range $key, $value := . }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+      tolerations:
+      - key: "virtual-kubelet.io/provider"
+        operator: "Exists"
+        effect: "NoSchedule"
+---
+{{ end }}
