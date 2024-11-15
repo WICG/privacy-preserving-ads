@@ -1,0 +1,76 @@
+# Portions Copyright (c) Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+replicaCount: 1
+admissionControllerReplicaCount: 1 # Set to 0 to also not register the admission controller webhook
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations:
+  microsoft.containerinstance.virtualnode.injectkubeproxy: "false"
+  microsoft.containerinstance.virtualnode.injectdns: "false"
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    add:
+      - NET_ADMIN
+      - NET_RAW
+
+nodeSelector:
+  "kubernetes.io/os": linux
+
+# Lack of tolerations will ensure virtual node pods are not scheduled on a virtual node itself
+tolerations: []
+
+affinity: {}
+
+## Install Default RBAC roles and bindings
+rbac:
+  install: true
+  serviceAccountName: virtual-node2-helm
+  ## RBAC api version
+  apiVersion: v1
+  ## Cluster role reference
+  roleRef: cluster-admin
+
+namespace: vn2
+aciSubnetName: cg # remember this subnet needs to be delegated to Microsoft.ContainerInstance/containerGroups
+sandboxProviderType: OnDemand
+
+nodeLabels: "container-image=unsecure" #Labels to add when registering the node in the cluster. Labels must be key=value pairs separated by ','. Labels in the 'kubernetes.io' namespace must begin with an allowed prefix ('kubelet.kubernetes.io', 'node.kubernetes.io') or be in the specifically allowed set ('beta.kubernetes.io/arch', 'beta.kubernetes.io/instance-type', 'beta.kubernetes.io/os', 'failure-domain.beta.kubernetes.io/region', 'failure-domain.beta.kubernetes.io/zone', 'kubernetes.io/arch', 'kubernetes.io/hostname', 'kubernetes.io/os', 'node.kubernetes.io/instance-type', 'topology.kubernetes.io/region', 'topology.kubernetes.io/zone')
+
+images:
+  pullPolicy: Always
+  pullSecrets: []
+  crisockettotcpadapterImage: mcr.microsoft.com/aci/virtual-node-2-cri-socket-adapter:main_20241017.3
+  proxycriImage: mcr.microsoft.com/aci/virtual-node-2-proxy-cri:main_20241017.3
+  mountImage: mcr.microsoft.com/aci/virtual-node-2-mount-host:main_20240920.2
+  initImage: mcr.microsoft.com/aci/virtual-node-2-init-config:main_20241017.3
+  kubeletImage: mcr.microsoft.com/aci/virtual-node-2-kubelet:main_20241017.3
+  virtualcsiImage: mcr.microsoft.com/aci/virtual-node-2-virtual-csi:main_20241017.3
+  admissioncontrollerImage: mcr.microsoft.com/aci/virtual-node-2-admission-controller:main_20241017.3
+  noddriverregistrarImage: mcr.microsoft.com/oss/kubernetes-csi/csi-node-driver-registrar:v2.8.0

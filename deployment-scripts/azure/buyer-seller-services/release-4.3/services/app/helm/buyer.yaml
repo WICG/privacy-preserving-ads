@@ -1,0 +1,141 @@
+# Portions Copyright (c) Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+namespace: "default"
+domain: "ad_selection.microsoft"
+services:
+  bidding-service:
+    replicas: 1
+    image: "mcr.microsoft.com/ad-selection/azure/bidding-service:prod-4.3.0.0"
+    containerPorts:
+      - name: grpc
+        port: 50057
+    healthCheck: {}
+    resources: {}
+    internalLB: true
+    nodeSelector: {}
+    volumeMounts:
+      - name: data-vol
+        mountPath: /data
+    env:
+      BIDDING_HEALTHCHECK_PORT: ""
+      BIDDING_PORT: ""
+      BIDDING_TCMALLOC_BACKGROUND_RELEASE_RATE_BYTES_PER_SECOND: ""
+      BIDDING_TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES: ""
+      BUYER_CODE_FETCH_CONFIG: ""
+      EGRESS_SCHEMA_FETCH_CONFIG: ""
+      ENABLE_BIDDING_SERVICE_BENCHMARK: ""
+      INFERENCE_SIDECAR_RUNTIME_CONFIG: ""
+      JS_NUM_WORKERS: ""
+      JS_WORKER_QUEUE_LEN: ""
+      SELECTION_KV_SERVER_ADDR: ""
+      SELECTION_KV_SERVER_EGRESS_TLS: ""
+      SELECTION_KV_SERVER_TIMEOUT_MS: ""
+      TEE_AD_RETRIEVAL_KV_SERVER_GRPC_ARG_DEFAULT_AUTHORITY: ""
+      TEE_KV_SERVER_GRPC_ARG_DEFAULT_AUTHORITY: ""
+  bfe:
+    replicas: 1
+    image: "mcr.microsoft.com/ad-selection/azure/buyer-frontend-service:prod-4.3.0.0"
+    containerPorts:
+      - name: grpc
+        port: 50051
+    healthCheck: {}
+    resources: {}
+    nodeSelector: {}
+    env:
+      BFE_INGRESS_TLS: ""
+      BFE_TCMALLOC_BACKGROUND_RELEASE_RATE_BYTES_PER_SECOND: ""
+      BFE_TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES: ""
+      BFE_TLS_CERT: ""
+      BFE_TLS_KEY: ""
+      BIDDING_EGRESS_TLS: ""
+      BIDDING_SERVER_ADDR: ""
+      BIDDING_SIGNALS_LOAD_TIMEOUT_MS: ""
+      BUYER_FRONTEND_HEALTHCHECK_PORT: ""
+      BUYER_FRONTEND_PORT: ""
+      BUYER_KV_SERVER_ADDR: ""
+      BYOS_AD_RETRIEVAL_SERVER: ""
+      CREATE_NEW_EVENT_ENGINE: ""
+      ENABLE_BIDDING_COMPRESSION: ""
+      ENABLE_BUYER_FRONTEND_BENCHMARKING: ""
+      GENERATE_BID_TIMEOUT_MS: ""
+      GRPC_ARG_DEFAULT_AUTHORITY: ""
+      PROTECTED_APP_SIGNALS_GENERATE_BID_TIMEOUT_MS: ""
+  k-anonymity-service:
+    replicas: 1
+    image: "mcr.microsoft.com/ad-selection/azure/k-anonymity-service:prod-4.3.0.0"
+    containerPorts:
+      - name: grpc
+        port: 50042
+    healthCheck: {}
+    resources: {}
+    internalLB: true
+    nodeSelector: {}
+    env:
+      ENABLE_K_ANONYMITY_SERVICE_BENCHMARK: ""
+      K_ANONYMITY_HEALTHCHECK_PORT: ""
+      K_ANONYMITY_PORT: ""
+      KANON_TCMALLOC_BACKGROUND_RELEASE_RATE_BYTES_PER_SECOND: ""
+      KANON_TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES: ""
+      REPLICA_REFRESH_INTERVAL_MIN: ""
+      TEE_REPLICA_K_ANONYMITY_HOST_ADDR: ""
+env:
+  AD_RETRIEVAL_KV_SERVER_ADDR: ""
+  AD_RETRIEVAL_KV_SERVER_EGRESS_TLS: ""
+  AD_RETRIEVAL_TIMEOUT_MS: ""
+  BUYER_EGRESS_TLS: ""
+  COLLECTOR_ENDPOINT: ""
+  CONSENTED_DEBUG_TOKEN: ""
+  ENABLE_BUYER_COMPRESSION: ""
+  ENABLE_CHAFFING: ""
+  ENABLE_ENCRYPTION: ""
+  ENABLE_OTEL_BASED_LOGGING: ""
+  ENABLE_PROTECTED_APP_SIGNALS: ""
+  INFERENCE_MODEL_BUCKET_NAME: ""
+  INFERENCE_MODEL_BUCKET_PATHS: ""
+  INFERENCE_MODEL_CONFIG_PATH: ""
+  INFERENCE_MODEL_FETCH_PERIOD_MS: ""
+  INFERENCE_MODEL_LOCAL_PATHS: ""
+  INFERENCE_SIDECAR_BINARY_PATH: ""
+  K_ANONYMITY_SERVER_ADDR: ""
+  K_ANONYMITY_SERVER_TIMEOUT_MS: ""
+  KEY_REFRESH_FLOW_RUN_FREQUENCY_SECONDS: ""
+  KV_SERVER_EGRESS_TLS: ""
+  MAX_ALLOWED_SIZE_DEBUG_URL_BYTES: ""
+  MAX_ALLOWED_SIZE_ALL_DEBUG_URLS_KB: ""
+  PRIVATE_KEY_CACHE_TTL_SECONDS: ""
+  PS_VERBOSITY: ""
+  ROMA_TIMEOUT_MS: ""
+  SELECTION_KV_SERVER_ADDR: ""
+  SELECTION_KV_SERVER_EGRESS_TLS: ""
+  SELECTION_KV_SERVER_TIMEOUT_MS: ""
+  TEE_AD_RETRIEVAL_KV_SERVER_ADDR: ""
+  TEE_KV_SERVER_ADDR: ""
+  TELEMETRY_CONFIG: ""
+  INSTRUMENTATION_KEY: ""
+  # Do not modify
+  AZURE_BA_PARAM_GET_TOKEN_URL: ""
+  AZURE_BA_PARAM_KMS_UNWRAP_URL: ""
+  ENABLE_PROTECTED_AUDIENCE: ""
+  PRIMARY_COORDINATOR_ACCOUNT_IDENTITY: ""
+  PRIMARY_COORDINATOR_PRIVATE_KEY_ENDPOINT: ""
+  PRIMARY_COORDINATOR_REGION: ""
+  PUBLIC_KEY_ENDPOINT: ""
+  TEST_MODE: ""
+
+storageAccount:
+  resourceGroup: ""
+  name: ""
+  fileShare: ""
+  accessKey: ""
