@@ -1,0 +1,104 @@
+# Portions Copyright (c) Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+namespace: "default"
+domain: "ad_selection.microsoft"
+services:
+  auction-service:
+    replicas: 1
+    image: "mcr.microsoft.com/ad-selection/azure/auction-service:prod-4.3.0.0"
+    containerPorts:
+      - name: grpc
+        port: 50061
+    healthCheck: {}
+    resources: {}
+    internalLB: true
+    ccePolicy: ""
+    nodeSelector: {}
+    env:
+      AUCTION_HEALTHCHECK_PORT: ""
+      AUCTION_PORT: ""
+      AUCTION_TCMALLOC_BACKGROUND_RELEASE_RATE_BYTES_PER_SECOND: ""
+      AUCTION_TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES: ""
+      ENABLE_AUCTION_SERVICE_BENCHMARK: ""
+      ENABLE_REPORT_WIN_INPUT_NOISING: ""
+      JS_NUM_WORKERS: ""
+      JS_WORKER_QUEUE_LEN: ""
+      SELLER_CODE_FETCH_CONFIG: ""
+  sfe:
+    replicas: 1
+    image: "mcr.microsoft.com/ad-selection/azure/seller-frontend-service:prod-4.3.0.0"
+    containerPorts:
+      - name: grpc
+        port: 50051
+      - name: envoy
+        port: 51052
+    healthCheck: {}
+    resources: {}
+    ccePolicy: ""
+    nodeSelector: {}
+    env:
+      AUCTION_SERVER_HOST: ""
+      BUYER_EGRESS_TLS: ""
+      BUYER_SERVER_HOSTS: ""
+      CREATE_NEW_EVENT_ENGINE: ""
+      ENABLE_BUYER_COMPRESSION: ""
+      ENABLE_SELLER_FRONTEND_BENCHMARKING: ""
+      GET_BID_RPC_TIMEOUT_MS: ""
+      GRPC_ARG_DEFAULT_AUTHORITY: ""
+      KEY_VALUE_SIGNALS_FETCH_RPC_TIMEOUT_MS: ""
+      KEY_VALUE_SIGNALS_HOST: ""
+      SCORE_ADS_RPC_TIMEOUT_MS: ""
+      SELLER_CLOUD_PLATFORMS_MAP: ""
+      SELLER_FRONTEND_HEALTHCHECK_PORT: ""
+      SELLER_FRONTEND_PORT: ""
+      SELLER_ORIGIN_DOMAIN: ""
+      SFE_TCMALLOC_BACKGROUND_RELEASE_RATE_BYTES_PER_SECOND: ""
+      SFE_TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES: ""
+env:
+  AUCTION_EGRESS_TLS: ""
+  AZURE_CERT: "your-sfe-keyvault-name"
+  AZURE_KEYVAULT_NAME: "sfe-envoy-cert-placeholder"
+  COLLECTOR_ENDPOINT: ""
+  CONSENTED_DEBUG_TOKEN: ""
+  ENABLE_AUCTION_COMPRESSION: ""
+  ENABLE_CHAFFING: ""
+  ENABLE_OTEL_BASED_LOGGING: ""
+  ENABLE_PROTECTED_APP_SIGNALS: ""
+  KEY_REFRESH_FLOW_RUN_FREQUENCY_SECONDS: ""
+  MAX_ALLOWED_SIZE_ALL_DEBUG_URLS_KB: ""
+  MAX_ALLOWED_SIZE_DEBUG_URL_BYTES: ""
+  PRIVATE_KEY_CACHE_TTL_SECONDS: ""
+  PS_VERBOSITY: ""
+  ROMA_TIMEOUT_MS: ""
+  SFE_INGRESS_TLS: ""
+  SFE_TLS_CERT: ""
+  SFE_TLS_KEY: ""
+  TELEMETRY_CONFIG: ""
+  INSTRUMENTATION_KEY: ""
+  # Do not modify
+  AZURE_BA_PARAM_GET_TOKEN_URL: ""
+  AZURE_BA_PARAM_KMS_UNWRAP_URL: ""
+  ENABLE_PROTECTED_AUDIENCE: ""
+  PRIMARY_COORDINATOR_ACCOUNT_IDENTITY: ""
+  PRIMARY_COORDINATOR_PRIVATE_KEY_ENDPOINT: ""
+  PRIMARY_COORDINATOR_REGION: ""
+  PUBLIC_KEY_ENDPOINT: ""
+  SFE_PUBLIC_KEYS_ENDPOINTS: ""
+  TEST_MODE: ""
+
+storageAccount:
+  resourceGroup: ""
+  name: ""
+  fileShare: ""
+  accessKey: ""

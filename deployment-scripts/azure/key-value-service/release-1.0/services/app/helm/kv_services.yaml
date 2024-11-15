@@ -1,0 +1,49 @@
+# Portions Copyright (c) Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+namespace: "default"
+domain: "ad_selection.microsoft"
+services:
+  kv:
+    replicas: 1
+    image: "mcr.microsoft.com/ad-selection/azure/key-value-service:prod-1.0.0.0"
+    containerPorts:
+      - name: grpc
+        port: 50051
+    healthCheck: {}
+    resources: {}
+    nodeSelector: {}
+    volumeName: "data-vol"
+    volumeMounts:
+      - name: data-vol
+        mountPath: /data
+    env:
+      PORT: ""
+      HEALTHCHECK_PORT: ""
+      AZURE_LOCAL_DATA_DIR: ""
+      AZURE_LOCAL_REALTIME_DATA_DIR: ""
+env:
+  PS_VERBOSITY: ""
+  TELEMETRY_CONFIG: ""
+  ENABLE_OTEL_BASED_LOGGING: ""
+  INSTRUMENTATION_KEY: ""
+  AZURE_BA_PARAM_GET_TOKEN_URL: ""
+  PUBLIC_KEY_ENDPOINT: ""
+  PRIMARY_COORDINATOR_PRIVATE_KEY_ENDPOINT: ""
+  AZURE_BA_PARAM_KMS_UNWRAP_URL: ""
+storageAccount:
+  resourceGroup: ""
+  name: ""
+  fileShare: ""
+  accessKey: ""
