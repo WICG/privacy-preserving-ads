@@ -57,7 +57,7 @@ module "aks" {
 }
 
 module "external_dns" {
-  source                     = "../../../../../production/terraform/azure/services/external_dns"
+  source                     = "../../services/external_dns"
   resource_group_id          = module.resource_group.id
   resource_group_name        = module.resource_group.name
   region                     = var.region
